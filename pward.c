@@ -8,25 +8,23 @@
 #include <getopt.h>
 #include <string.h>
 
-// gcc -g -lproc-3.2.6 barrier.c -std=c99 -o barrier
+// gcc -g -lproc-3.2.6 pward.c -std=c99 -o pward
 
 // blocked, non blocked
 // wait for process, socket ...
 // verbose, terse
 
-// put exe option with the command to execute
-// make sure that the command is not run if no match is found ever
-// have a silent flag to not dump the initial commands at startup
+// TODO
+
 // rewrite using bsd process monitoring
 
 // make wake-up period configurable
-//   alternatively babysit, nurse , pnurse, pward
+//   alternative names: babysit, nurse , pnurse, pward, (barrier considered bad)
 
 // add extra checks like ownership (does not make sense if it takes pids) HOORAH
 // -u root u
 
 #define VERSION "1"
-
 #define MAX_CMD_LENGTH 1024
 
 static void
@@ -69,8 +67,15 @@ int cmppid(const void* l, const void* r)
   return *((pid_t*)l)-*((pid_t*)r);
 }
 
+#define SWAP(Type,parg1,parg2) \
+{ \
+  Type *p1=parg1, *p2=parg2, tmp=*p1; \
+  *p1=*p2; \
+  *p2=tmp; \
+}
+
 static
-int init_check_procs(PROCTAB* ptp, pid_t* pids, unsigned long long* startTimes, size_t nProcs, _Bool batch)
+int init_check_procs(PROCTAB* ptp, size_t nProcs, pid_t* pids, unsigned long long* startTimes, _Bool batch)
 {
   proc_t buf;
   pid_t* pidsstart=pids;
@@ -81,9 +86,7 @@ int init_check_procs(PROCTAB* ptp, pid_t* pids, unsigned long long* startTimes, 
 	(pid_t*)lfind(&buf.tgid,pids,&nProcs,sizeof(pid_t),cmppid);
       if(p!=NULL)
 	{
-	  pid_t tmp=*p;
-	  *p=*pids;
-	  *pids=tmp;
+	  SWAP(pid_t,p,pids);
 
 	  *startTimes=buf.start_time;  
 	  --nProcs;++pids;++startTimes;
@@ -98,40 +101,49 @@ int init_check_procs(PROCTAB* ptp, pid_t* pids, unsigned long long* startTimes, 
   return pids-pidsstart; // processes_found
 }
 
-// this stops checking after a single positive is found
-// hence: sometimes an overestimate might be returned in nProc
+// BUG!!!
+// TODO: split between return value and number of processes that still need checking
 
 static
-int check_procs(PROCTAB* ptp, pid_t* pids, unsigned long long* startTimes, size_t nProcs)
+int check_procs(PROCTAB* ptp, size_t nProcs, pid_t* pids, unsigned long long* startTimes, 
+		size_t treshold,_Bool batch)
 {
   proc_t buf;
   pid_t* pidsstart=pids;
 
-  while(readproc(ptp,&buf))
+  while(nProcs && readproc(ptp,&buf))
     {
       pid_t* p=
 	(pid_t*)lfind(&buf.tgid,pids,&nProcs,sizeof(pid_t),cmppid);
       if(p!=NULL)
 	{
+	  --nProcs;
 	  if(startTimes[p-pids]==buf.start_time)
 	    {
-	      cleanup_proc(&buf);
-	      return nProcs;
+	      SWAP(pid_t,p,pids);
+	      SWAP(unsigned long long,startTimes,startTimes+(p-pids));
+	      ++pids,++startTimes; // entry can only be found once, so increment base value
+	      if((pids-pidsstart)>=treshold)
+		{
+		  cleanup_proc(&buf);
+		  return pids-pidsstart;
+		}
 	    }
 	  else
 	    {
-	      printf("detected reused process id %d\n",buf.tgid);
-	      printf("%d %llu %s\n",buf.tgid,buf.start_time,buf.cmd);
-	      cleanup_proc(&buf);
-	      // ignore restarted pids in future runs, by moving them to the end of the array
-	      --nProcs;
+	      if(!batch)
+		{
+		  printf("detected reused process id %d\n",buf.tgid);
+		  printf("%d %llu %s\n",buf.tgid,buf.start_time,buf.cmd);
+		}
+	      // ignore restarted pids in future runs
 	      *p=pids[nProcs];
 	      startTimes[p-pids]=startTimes[nProcs];
 	    }
 	}
       cleanup_proc(&buf);
     }
-  return 0;
+  return pids-pidsstart;
 }
 
 int main(int argc,const char* argv[])
@@ -140,12 +152,12 @@ int main(int argc,const char* argv[])
   _Bool batch=0;
 
   int running=0;
-  int stopped=1;
   char cmd[MAX_CMD_LENGTH]="\0";
+  int stopped=argc; // overestimate
+  int nOptions=0;
 
   while(1)
     {
-      int option_index = 0;
       static struct option long_options[]=
 	{
 	  {"verbose", 0, 0, 'v'},
@@ -157,11 +169,12 @@ int main(int argc,const char* argv[])
 	  {0, 0, 0, 0}
 	};
     
-      int c = getopt_long (argc,(char* const*)argv, "vhfr::s::e:",
-		       long_options, &option_index);
+      int c = getopt_long(argc,(char* const*)argv, "vhfr::s::e:",
+		       long_options,NULL);
       if(c==-1)
 	break;
 
+      ++nOptions;
       switch(c)
 	{
 	case 'v':
@@ -175,8 +188,8 @@ int main(int argc,const char* argv[])
 	    running=convert_to_number(optarg);
 	  break;
 	case 's':
-	  if(optarg!=NULL)
-	    stopped=convert_to_number(optarg);
+	  stopped=(optarg!=NULL)?
+	    convert_to_number(optarg):1;
 	  break;
 	case 'e':
 	  printf ("option short e with value '%s'\n", optarg);
@@ -192,15 +205,18 @@ int main(int argc,const char* argv[])
 	}
     }
 
-  size_t nProcs=argc-1;
-  pid_t pids[nProcs];
-  unsigned long long startTimes[nProcs];
-  for(int i=0;i<nProcs;++i)
+  int nLastOptionIndex=nOptions+1; // exclude program-name
+  size_t nProcsInit=argc-nLastOptionIndex;
+
+  pid_t pids[nProcsInit];
+  unsigned long long startTimes[nProcsInit];
+  for(int i=0;i<nProcsInit;++i)
     {
-      pids[i]=convert_to_number(argv[i+1]);
-      // startTimes[i]=~0ULL;
+      pids[i]=convert_to_number(argv[i+nLastOptionIndex]); 
+      startTimes[i]=~0ULL;
     }
 
+  size_t nProcs;
   {
     PROCTAB* ptp=openproc(PROC_FILLARG|PROC_FILLSTAT);
     if(!ptp)
@@ -208,7 +224,7 @@ int main(int argc,const char* argv[])
 	fprintf(stderr, "Error: cannot access /proc.\n");
 	exit(-1);
       }
-    size_t nProcs=init_check_procs(ptp,pids,startTimes,nProcs, batch);
+    nProcs=init_check_procs(ptp,nProcsInit,pids,startTimes,batch);
     if(!batch)
       {
 	if(!nProcs)
@@ -219,17 +235,23 @@ int main(int argc,const char* argv[])
       }
     closeproc(ptp);
   }
+
+  if((nProcsInit>=stopped) && (running<nProcsInit-stopped))
+    running=nProcsInit-stopped;
     
   while(nProcs>running)
     {
-      PROCTAB* ptp=ptp=openproc(PROC_FILLSTAT);
+      PROCTAB* ptp=openproc(PROC_FILLSTAT);
       if(!ptp)
 	{
 	  fprintf(stderr, "Error: cannot access /proc.\n");
-	  exit(1);
+	  exit(-3);
 	}
-      nProcs=check_procs(ptp,pids,startTimes,nProcs);
+      nProcs=check_procs(ptp,nProcs,pids,startTimes,running,batch);
       closeproc(ptp);
     }
+
+  if(*cmd!='\x0')
+    system(cmd);
   return 0;
 }
