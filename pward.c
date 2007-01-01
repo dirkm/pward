@@ -1,5 +1,4 @@
 #include <proc/readproc.h>
-#include <proc/sysinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <search.h>
@@ -8,7 +7,7 @@
 #include <getopt.h>
 #include <string.h>
 
-// gcc -g -lproc-3.2.6 pward.c -std=c99 -o pward
+// gcc -g -lproc-3.2.6 pward.c -std=c99 -o pward -Wall
 
 // blocked, non blocked
 // wait for process, socket ...
@@ -36,6 +35,8 @@ print_usage(const char* name)
 "  running_processes: stop if only n processes are running : (default 0)\n"
 "  stopped_processes: stop if n processes are stopped : (default 1)\n",name,name);
 }
+
+// TODO: add check to see if really number
 
 static 
 int convert_to_number(const char* arg)
@@ -75,10 +76,18 @@ int cmppid(const void* l, const void* r)
 }
 
 static
-int init_check_procs(PROCTAB* ptp, size_t nProcs, pid_t* pids, unsigned long long* startTimes, _Bool batch)
+int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes, _Bool batch)
 {
   proc_t buf;
   pid_t* pidsstart=pids;
+
+  PROCTAB* ptp=openproc(PROC_FILLARG|PROC_FILLSTAT);
+  if(!ptp)
+    {
+      fprintf(stderr, "Error: cannot access /proc.\n");
+      exit(-3);
+    }
+
   printf("checked processes\n");
   while(readproc(ptp,&buf))
     {
@@ -98,18 +107,28 @@ int init_check_procs(PROCTAB* ptp, size_t nProcs, pid_t* pids, unsigned long lon
     }
   if(!batch)
     printf("=====\n");
+
+  closeproc(ptp);
   return pids-pidsstart; // processes_found
 }
 
-// BUG!!!
-// TODO: split between return value and number of processes that still need checking
+// return-value: 
+//   Normally: number of processes still found
+//   If treshold <> 0: overestimate ->  number of processes still to be considered 
 
 static
-int check_procs(PROCTAB* ptp, size_t nProcs, pid_t* pids, unsigned long long* startTimes, 
-		size_t treshold,_Bool batch)
+int check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes, 
+		size_t treshold, _Bool batch)
 {
   proc_t buf;
   pid_t* pidsstart=pids;
+
+  PROCTAB* ptp=openproc(PROC_FILLSTAT);
+  if(!ptp)
+    {
+      fprintf(stderr, "Error: cannot access /proc.\n");
+      exit(-3);
+    }
 
   while(nProcs && readproc(ptp,&buf))
     {
@@ -123,10 +142,11 @@ int check_procs(PROCTAB* ptp, size_t nProcs, pid_t* pids, unsigned long long* st
 	      SWAP(pid_t,p,pids);
 	      SWAP(unsigned long long,startTimes,startTimes+(p-pids));
 	      ++pids,++startTimes; // entry can only be found once, so increment base value
-	      if((pids-pidsstart)>=treshold)
+	      if((pids-pidsstart)>treshold)
 		{
+		  pids+=nProcs; // return overestimate (pretend all remaining entries are matches)
 		  cleanup_proc(&buf);
-		  return pids-pidsstart;
+		  break;
 		}
 	    }
 	  else
@@ -143,6 +163,7 @@ int check_procs(PROCTAB* ptp, size_t nProcs, pid_t* pids, unsigned long long* st
 	}
       cleanup_proc(&buf);
     }
+  closeproc(ptp);
   return pids-pidsstart;
 }
 
@@ -151,9 +172,12 @@ int main(int argc,const char* argv[])
   _Bool verbose=0;
   _Bool batch=0;
 
-  int running=0;
   char cmd[MAX_CMD_LENGTH]="\0";
-  int stopped=argc; // overestimate
+
+  size_t running=0;
+
+  _Bool stopCondition=0;
+  size_t stopped=0;
   int nOptions=0;
 
   while(1)
@@ -188,15 +212,17 @@ int main(int argc,const char* argv[])
 	    running=convert_to_number(optarg);
 	  break;
 	case 's':
+	  stopCondition=1;
 	  stopped=(optarg!=NULL)?
 	    convert_to_number(optarg):1;
 	  break;
 	case 'e':
-	  printf ("option short e with value '%s'\n", optarg);
+	  printf("option short e with value '%s'\n", optarg);
 	  strncpy(cmd,optarg,MAX_CMD_LENGTH);
 	  if(cmd[MAX_CMD_LENGTH-1]!='\x0')
 	    {
 	      printf ("command longer than max allowed length '%d'\n", MAX_CMD_LENGTH);
+	      exit(-3);
 	    }
 	  break;
 	case 'b':
@@ -208,47 +234,41 @@ int main(int argc,const char* argv[])
   int nLastOptionIndex=nOptions+1; // exclude program-name
   size_t nProcsInit=argc-nLastOptionIndex;
 
+  // recalculate stop as number of running processes
+  if(stopCondition)
+    {
+      if(nProcsInit<stopped)
+	{
+	  if(!batch)
+	    fprintf(stderr, "warning: waiting for more stopped processes than given at input\n");
+	}
+      else if(running<nProcsInit-stopped)
+	running=nProcsInit-stopped;
+    }
+
   pid_t pids[nProcsInit];
   unsigned long long startTimes[nProcsInit];
   for(int i=0;i<nProcsInit;++i)
     {
-      pids[i]=convert_to_number(argv[i+nLastOptionIndex]); 
+      pids[i]=convert_to_number(argv[nLastOptionIndex+i]); 
       startTimes[i]=~0ULL;
     }
 
-  size_t nProcs;
-  {
-    PROCTAB* ptp=openproc(PROC_FILLARG|PROC_FILLSTAT);
-    if(!ptp)
-      {
-	fprintf(stderr, "Error: cannot access /proc.\n");
-	exit(-1);
-      }
-    nProcs=init_check_procs(ptp,nProcsInit,pids,startTimes,batch);
-    if(!batch)
-      {
-	if(!nProcs)
-	  {
-	    fprintf(stderr, "no running process detected, bailing out\n");
-	    exit(-2);
-	  }
-      }
-    closeproc(ptp);
-  }
+  size_t nProcs=init_check_procs(nProcsInit,pids,startTimes,batch);
+  if(!batch)
+    {
+      if(!nProcs)
+	{
+	  fprintf(stderr, "no running process detected, bailing out\n");
+	  exit(-2);
+	}
+    }
 
-  if((nProcsInit>=stopped) && (running<nProcsInit-stopped))
-    running=nProcsInit-stopped;
-    
   while(nProcs>running)
     {
-      PROCTAB* ptp=openproc(PROC_FILLSTAT);
-      if(!ptp)
-	{
-	  fprintf(stderr, "Error: cannot access /proc.\n");
-	  exit(-3);
-	}
-      nProcs=check_procs(ptp,nProcs,pids,startTimes,running,batch);
-      closeproc(ptp);
+      sleep(1); // TODO: could be made configurable
+      nProcs=check_procs(nProcs,pids,startTimes,running,batch);
+      fprintf(stdout, "number of running procs: %d\n",nProcs);
     }
 
   if(*cmd!='\x0')
