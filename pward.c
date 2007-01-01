@@ -7,21 +7,20 @@
 #include <getopt.h>
 #include <string.h>
 
-// gcc -g -lproc-3.2.6 pward.c -std=c99 -o pward -Wall
+/* gcc -g -lproc-3.2.6 pward.c -std=c99 -o pward -Wall */
 
-// blocked, non blocked
-// wait for process, socket ...
-// verbose, terse
+/* blocked, non blocked */
+/* wait for process, socket ... */
+/* verbose, terse */
 
-// TODO
+/* TODO: */
+/* rewrite using bsd process monitoring */
 
-// rewrite using bsd process monitoring
+/* make wake-up period configurable */
+/*   alternative names: babysit, nurse , pnurse, pward, (barrier considered bad) */
 
-// make wake-up period configurable
-//   alternative names: babysit, nurse , pnurse, pward, (barrier considered bad)
-
-// add extra checks like ownership (does not make sense if it takes pids) HOORAH
-// -u root u
+/* add extra checks like ownership (does not make sense if it takes pids) HOORAH */
+/* -u root u */
 
 #define VERSION "1"
 #define MAX_CMD_LENGTH 1024
@@ -31,12 +30,13 @@ print_usage(const char* name)
 {
   printf(
 "   %s: version "VERSION" \n"
-"usage: %s -hv [-f] | [-r running_processes | -s stopped_processes] -e cmd_at_exit\n"
-"  running_processes: stop if only n processes are running : (default 0)\n"
-"  stopped_processes: stop if n processes are stopped : (default 1)\n",name,name);
+"usage: %s -hv [-f] | [-r running_procs | -s stopped_procs] -e cmd_at_exit\n"
+"  running_procs: stop if only n processes are running : (default 0)\n"
+"  stopped_procs: stop if n processes are stopped : (default 1)\n"
+"  cmd_at_exit: command to be executed if treshold met\n",name,name);
 }
 
-// TODO: add check to see if really number
+/* TODO: add check to see if really number */
 
 static 
 int convert_to_number(const char* arg)
@@ -76,7 +76,7 @@ int cmppid(const void* l, const void* r)
 }
 
 static
-int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes, _Bool batch)
+int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes, _Bool verbose)
 {
   proc_t buf;
   pid_t* pidsstart=pids;
@@ -85,10 +85,12 @@ int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
   if(!ptp)
     {
       fprintf(stderr, "Error: cannot access /proc.\n");
-      exit(-3);
+      exit(-1);
     }
 
-  printf("checked processes\n");
+  if(verbose)
+    printf("checked processes\n");
+
   while(readproc(ptp,&buf))
     {
       pid_t* p=
@@ -100,25 +102,25 @@ int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
 	  *startTimes=buf.start_time;  
 	  --nProcs;++pids;++startTimes;
 
-	  if(!batch)
+	  if(verbose)
 	      printf("%d %llu %s\n",buf.tgid,buf.start_time,buf.cmd);
 	}
       cleanup_proc(&buf);
     }
-  if(!batch)
+  if(verbose)
     printf("=====\n");
 
   closeproc(ptp);
   return pids-pidsstart; // processes_found
 }
 
-// return-value: 
-//   Normally: number of processes still found
-//   If treshold <> 0: overestimate ->  number of processes still to be considered 
+/* return-value:  */
+/*   Normally: number of processes still found */
+/*   if treshold not met: overestimate ->  number of processes still to be considered  */
 
 static
 int check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes, 
-		size_t treshold, _Bool batch)
+		size_t treshold, _Bool verbose)
 {
   proc_t buf;
   pid_t* pidsstart=pids;
@@ -127,7 +129,7 @@ int check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
   if(!ptp)
     {
       fprintf(stderr, "Error: cannot access /proc.\n");
-      exit(-3);
+      exit(-2);
     }
 
   while(nProcs && readproc(ptp,&buf))
@@ -141,22 +143,22 @@ int check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
 	    {
 	      SWAP(pid_t,p,pids);
 	      SWAP(unsigned long long,startTimes,startTimes+(p-pids));
-	      ++pids,++startTimes; // entry can only be found once, so increment base value
+	      ++pids,++startTimes; /* entry can only be found once, so increment base value */
 	      if((pids-pidsstart)>treshold)
 		{
-		  pids+=nProcs; // return overestimate (pretend all remaining entries are matches)
+		  pids+=nProcs; /* return overestimate (pretend all remaining entries are matches) */
 		  cleanup_proc(&buf);
 		  break;
 		}
 	    }
 	  else
 	    {
-	      if(!batch)
+	      if(verbose)
 		{
 		  printf("detected reused process id %d\n",buf.tgid);
 		  printf("%d %llu %s\n",buf.tgid,buf.start_time,buf.cmd);
 		}
-	      // ignore restarted pids in future runs
+	      /* ignore restarted pids in future runs */
 	      *p=pids[nProcs];
 	      startTimes[p-pids]=startTimes[nProcs];
 	    }
@@ -217,7 +219,6 @@ int main(int argc,const char* argv[])
 	    convert_to_number(optarg):1;
 	  break;
 	case 'e':
-	  printf("option short e with value '%s'\n", optarg);
 	  strncpy(cmd,optarg,MAX_CMD_LENGTH);
 	  if(cmd[MAX_CMD_LENGTH-1]!='\x0')
 	    {
@@ -231,10 +232,10 @@ int main(int argc,const char* argv[])
 	}
     }
 
-  int nLastOptionIndex=nOptions+1; // exclude program-name
+  int nLastOptionIndex=nOptions+1; /* exclude program-name */
   size_t nProcsInit=argc-nLastOptionIndex;
 
-  // recalculate stop as number of running processes
+  /* recalculate 'stop' in terms of number of running processes */
   if(stopCondition)
     {
       if(nProcsInit<stopped)
@@ -254,21 +255,17 @@ int main(int argc,const char* argv[])
       startTimes[i]=~0ULL;
     }
 
-  size_t nProcs=init_check_procs(nProcsInit,pids,startTimes,batch);
-  if(!batch)
+  size_t nProcs=init_check_procs(nProcsInit,pids,startTimes,verbose);
+  if(!batch && !nProcs)
     {
-      if(!nProcs)
-	{
-	  fprintf(stderr, "no running process detected, bailing out\n");
-	  exit(-2);
-	}
+      fprintf(stderr, "no running process detected, bailing out\n");
+      exit(-4);
     }
 
   while(nProcs>running)
     {
-      sleep(1); // TODO: could be made configurable
-      nProcs=check_procs(nProcs,pids,startTimes,running,batch);
-      fprintf(stdout, "number of running procs: %d\n",nProcs);
+      sleep(1); /* TODO: could be made configurable */
+      nProcs=check_procs(nProcs,pids,startTimes,running,verbose);
     }
 
   if(*cmd!='\x0')
