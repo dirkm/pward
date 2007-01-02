@@ -252,7 +252,7 @@ int main(int argc,const char* argv[])
       if(nProcsInit<stopped)
 	{
 	  if(!batch)
-	    fprintf(stderr, "warning: requesting more stopped processes than the total number of processes at startup\n");
+	    fprintf(stderr, "warning: requesting more stopped processes than the number of processes at startup\n");
 	}
       else if(running<nProcsInit-stopped)
 	running=nProcsInit-stopped;
