@@ -1,0 +1,1 @@
+./pward `pgrep emerge` -e"shutdown -h +10" -v
