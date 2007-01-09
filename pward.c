@@ -149,7 +149,7 @@ int main(int argc,const char* argv[])
       pids[i]=convert_to_number(argv[nLastOptionIndex+i]); 
     }
   
-  int result=proc_observe_processes(nProcsInit,pids,running,batch,verbose,nInterval);
+  int result=proc_observe_processes(pids,running,batch,verbose,nInterval);
   if(result)
     exit(result);
 
