@@ -27,14 +27,9 @@ void cleanup_proc(proc_t* p)
 }
 
 static
-int init_check_procs(pid_t pids[*], unsigned long long startTimes[*],
+int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
 		     _Bool verbose)
 {
-  size_t nProcs=sizeof(pids)/sizeof(pids[0]);
-
-  proc_t buf;
-  pid_t* pidsstart=pids;
-
   PROCTAB* ptp=openproc(PROC_FILLARG|PROC_FILLSTAT);
   if(!ptp)
     {
@@ -48,6 +43,8 @@ int init_check_procs(pid_t pids[*], unsigned long long startTimes[*],
       printf(proc_dump_header);
     }
 
+  pid_t* pidsstart=pids;
+  proc_t buf;
   while(readproc(ptp,&buf))
     {
       pid_t* p=
@@ -77,12 +74,9 @@ int init_check_procs(pid_t pids[*], unsigned long long startTimes[*],
      number of processes still to be considered  */
 
 static
-int check_procs(size_t nProcs,pid_t pids[*], unsigned long long startTimes[*],
+int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
 		size_t treshold, _Bool verbose)
 {
-  proc_t buf;
-  pid_t* pidsstart=pids;
-
   PROCTAB* ptp=openproc(PROC_FILLSTAT);
   if(!ptp)
     {
@@ -90,6 +84,8 @@ int check_procs(size_t nProcs,pid_t pids[*], unsigned long long startTimes[*],
       exit(-2);
     }
 
+  pid_t* pidsstart=pids;
+  proc_t buf;
   while(nProcs && readproc(ptp,&buf))
     {
       pid_t* p=
@@ -130,17 +126,15 @@ int check_procs(size_t nProcs,pid_t pids[*], unsigned long long startTimes[*],
 }
 
 int
-proc_observe_processes(pid_t pids[*],size_t running,_Bool batch,_Bool verbose, int nInterval)
+proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,_Bool batch,_Bool verbose, int nInterval)
 {
-  size_t nProcsInit=sizeof(pids)/sizeof(pids[0]);
   unsigned long long startTimes[nProcsInit];
-
   for(int i=0;i<nProcsInit;++i)
     {
       startTimes[i]=~0ULL;
     }
 
-  size_t nProcs=init_check_procs(pids,startTimes,verbose);
+  size_t nProcs=init_check_procs(nProcsInit,pids,startTimes,verbose);
   if(!batch && !nProcs)
     {
       fprintf(stderr, "no processes found, bailing out\n");
