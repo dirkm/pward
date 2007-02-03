@@ -146,7 +146,7 @@ proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,_Bool batch,
       nProcs=check_procs(nProcs,pids,startTimes,running,verbose);
       if(nProcs<=running)
 	break;
-      sleep(nInterval);
+      sleep(nInterval); // TODO: not sure if absolute wait is desirable
     }
 
   return 0;

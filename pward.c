@@ -1,35 +1,31 @@
+#define _GNU_SOURCE
 #include "proc_impl.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <getopt.h>
+
 #include <string.h>
 #include <limits.h>
 #include <sys/types.h>
 
-/* gcc -g -lproc-3.2.6 pward.c -std=c99 -o pward -Wall */
-
-/* blocked, non blocked */
+/* blocked, non blocked, rewrite as client/server */
 /* wait for process, socket ... */
 /* verbose, terse */
 
-/* TODO: */
 /* rewrite using bsd process monitoring */
+/* TODO: BSD processing monitoring does not seem to be suited; programs might stop before pward opened the file */
 
-/*   alternative names: babysit, nurse , pnurse, pward, (barrier considered bad) */
-/* find way to allocate command-string on stack */
-/* add extra checks like ownership (does not make sense if it takes pids) HOORAH */
-/* -u root u */
+/* adding extra checks like ownership does not make sense if it takes pids HOORAH */
 
 #define VERSION "1"
-#define MAX_CMD_LENGTH 1024
 
 static void
 print_usage(const char* name)
 {
   printf(
-"\t%1$s: version "VERSION" \n"
+"%1$s: version "VERSION" \n"
 "usage: %1$s -hv [-f] | [-r running_procs | -s stopped_procs]\n"
 "\t\t-e cmd_at_exit -i interval_time\n"
 "\trunning_procs: stop if only n processes are running : (default 0)\n"
@@ -51,7 +47,7 @@ int convert_to_number(const char* arg)
       ||((errno != 0) && (result == 0))
       ||(*endptr!='\0'))
     {
-      printf ("non numeric parameter '%s'\n", optarg);
+      printf("non numeric parameter '%s'\n", arg);
       exit(-1);
     }
   return result;
@@ -61,9 +57,7 @@ int main(int argc,const char* argv[])
 {
   _Bool verbose=0;
   _Bool batch=0;
-
-  char cmd[MAX_CMD_LENGTH]="\0";
-
+  char* cmd="";
   size_t running=0;
 
   _Bool stopCondition=0;
@@ -109,12 +103,12 @@ int main(int argc,const char* argv[])
 	    convert_to_number(optarg):1;
 	  break;
 	case 'e':
-	  strncpy(cmd,optarg,MAX_CMD_LENGTH);
-	  if(cmd[MAX_CMD_LENGTH-1]!='\x0')
+	  if(optarg!=NULL) // TODO: this does not zork if there is a space between command and argument
+	    cmd=strdupa(optarg);
+	  else
 	    {
-	      printf("command longer than max allowed length '%d'\n", 
-		     MAX_CMD_LENGTH);
-	      exit(-3);
+	      printf("missing argument to command option");
+	      exit(-1);
 	    }
 	  break;
 	case 'b':

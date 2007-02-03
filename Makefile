@@ -1,7 +1,7 @@
 CFLAGS:=-g -std=c99 -Wall
 LDFLAGS:=-g -lproc-3.2.6
 
-OBJECTS:= pward.o proc_impl.o acct_impl.o
+SOURCES:= pward.c proc_impl.c
 
-pward: ${OBJECTS}
-
+pward: ${SOURCES}
+	${CC} ${CFLAGS} ${LDFLAGS} -pipe -combine ${SOURCES} -o $@
