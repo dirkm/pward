@@ -36,21 +36,22 @@ print_usage(const char* name)
 
 /* TODO: add error-handling */
 
+#define NOT_NUMBER -1
+
 static 
-int convert_to_number(const char* arg)
+int convert_to_number(const char* arg,void* number)
 {
   errno = 0;
   char* endptr;
-  int result=strtol(arg,&endptr, 10);
+  long result=
+  result=strtol(arg,&endptr, 10);
   
   if (((errno == ERANGE) && (result == LONG_MAX || result == LONG_MIN))
       ||((errno != 0) && (result == 0))
       ||(*endptr!='\0'))
-    {
-      printf("non numeric parameter '%s'\n", arg);
-      exit(-1);
-    }
-  return result;
+    return NOT_NUMBER;
+  *((long*)number)=result;
+  return 0;
 }
 
 int main(int argc,const char* argv[])
@@ -95,27 +96,43 @@ int main(int argc,const char* argv[])
 	  exit(-1);
 	case 'r':
 	  if(optarg!=NULL)
-	    running=convert_to_number(optarg);
+	    if(convert_to_number(optarg,&running))
+	      {
+		fprintf(stderr,"non numeric parameter at input");
+		return -1;
+	      }
 	  break;
 	case 's':
 	  stopCondition=1;
-	  stopped=(optarg!=NULL)?
-	    convert_to_number(optarg):1;
+	  if(optarg!=NULL)
+	    {
+	      if(convert_to_number(optarg,&stopped))
+		{
+		  fprintf(stderr,"non numeric parameter at input");
+		  return -1;
+		}
+	    }
+	  else
+	    stopped=1;
 	  break;
 	case 'e':
-	  if(optarg!=NULL) // TODO: this does not zork if there is a space between command and argument
+	  if(optarg!=NULL) // TODO: this does not work if there is a space between command and argument
 	    cmd=strdupa(optarg);
 	  else
 	    {
 	      printf("missing argument to command option");
-	      exit(-1);
+	      return -1;
 	    }
 	  break;
 	case 'b':
 	  batch=1;
 	  break;
 	case 'i':
-	  nInterval=convert_to_number(optarg);
+	  if(convert_to_number(optarg,&nInterval))
+	    {
+	      fprintf(stderr,"non numeric parameter at input");
+	      return -1;
+	    }
 	  break;
 	}
     }
@@ -140,7 +157,11 @@ int main(int argc,const char* argv[])
   pid_t pids[nProcsInit];
   for(int i=0;i<nProcsInit;++i)
     {
-      pids[i]=convert_to_number(argv[nLastOptionIndex+i]); 
+      if(convert_to_number(argv[nLastOptionIndex+i],pids+i))
+	{
+	  fprintf(stderr,"non numeric parameter at input");
+	  return -1;
+	}
     }
   
   int result=proc_observe_processes(nProcsInit,pids,running,batch,verbose,nInterval);
