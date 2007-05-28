@@ -16,9 +16,10 @@
 /* verbose, terse */
 
 /* TODO */
-/* explore se-linux as process tracking mech */
-/* explore ptrace as process tracking mech */
+/* explore se-linux for process tracking */
+/* explore ptrace for process tracking */
 
+/* tried but failed */
 /* attempted BSD process accounting but turned out ugly */
 
 static void

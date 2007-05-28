@@ -11,6 +11,16 @@ AC_PROG_CC
 
 # Checks for libraries.
 
+AC_ARG_WITH([proc],
+  [  --with-proc=proc
+                          used proc library],
+  [if test x"$withval" != x ; then
+     LPROC="$withval"
+   fi],
+  [LPROC=proc])
+AC_SUBST(LPROC)
+
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([limits.h stdlib.h string.h])
