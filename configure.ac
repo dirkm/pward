@@ -2,7 +2,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(pward,1,dirkmoermans@gmail.com)
-AM_INIT_AUTOMAKE(pward, 2.6)
+AM_INIT_AUTOMAKE
 AC_OUTPUT(Makefile src/Makefile)
 AC_CONFIG_SRCDIR([src/proc_impl.c])
 
