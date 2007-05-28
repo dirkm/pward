@@ -10,31 +10,29 @@
 #include <limits.h>
 #include <sys/types.h>
 
-/* blocked, non blocked, rewrite as client/server */
+/* TODO */
+
 /* wait for process, socket ... */
 /* verbose, terse */
 
-/* rewrite using bsd process monitoring */
-/* TODO: BSD processing monitoring does not seem to be suited; programs might stop before pward opened the file */
+/* TODO */
+/* explore se-linux as process tracking mech */
+/* explore ptrace as process tracking mech */
 
-/* adding extra checks like ownership does not make sense if it takes pids HOORAH */
-
-#define VERSION "1"
+/* attempted BSD process accounting but turned out ugly */
 
 static void
 print_usage(const char* name)
 {
   printf(
-"%1$s: version "VERSION" \n"
+"%1$s: version "PACKAGE_VERSION" \n"
 "usage: %1$s -hv [-f] | [-r running_procs | -s stopped_procs]\n"
 "\t\t-e cmd_at_exit -i interval_time\n"
-"\trunning_procs: stop if only n processes are running : (default 0)\n"
-"\tstopped_procs: stop if n processes are stopped : (default 1)\n"
+"\trunning_procs: stop if only n running processes are: (default 0)\n"
+"\tstopped_procs: stop if n processes are stopped: (default 1)\n"
 "\tcmd_at_exit: command to be executed if treshold met\n"
 "\tinterval_time: polling interval\n",name);
 }
-
-/* TODO: add error-handling */
 
 #define NOT_NUMBER -1
 
@@ -98,7 +96,7 @@ int main(int argc,const char* argv[])
 	  if(optarg!=NULL)
 	    if(convert_to_number(optarg,&running))
 	      {
-		fprintf(stderr,"non numeric parameter at input");
+		fprintf(stderr,"non numeric parameter as number of running processes");
 		return -1;
 	      }
 	  break;
@@ -108,7 +106,7 @@ int main(int argc,const char* argv[])
 	    {
 	      if(convert_to_number(optarg,&stopped))
 		{
-		  fprintf(stderr,"non numeric parameter at input");
+		  fprintf(stderr,"non numeric parameter as number as stopped processes\n");
 		  return -1;
 		}
 	    }
@@ -116,11 +114,11 @@ int main(int argc,const char* argv[])
 	    stopped=1;
 	  break;
 	case 'e':
-	  if(optarg!=NULL) // TODO: this does not work if there is a space between command and argument
+	  if(optarg!=NULL) 
 	    cmd=strdupa(optarg);
 	  else
 	    {
-	      printf("missing argument to command option");
+	      printf("missing argument to command option\n");
 	      return -1;
 	    }
 	  break;
@@ -130,7 +128,7 @@ int main(int argc,const char* argv[])
 	case 'i':
 	  if(convert_to_number(optarg,&nInterval))
 	    {
-	      fprintf(stderr,"non numeric parameter at input");
+	      fprintf(stderr,"non numeric parameter as interval time\n");
 	      return -1;
 	    }
 	  break;
@@ -159,7 +157,7 @@ int main(int argc,const char* argv[])
     {
       if(convert_to_number(argv[nLastOptionIndex+i],pids+i))
 	{
-	  fprintf(stderr,"non numeric parameter at input");
+	  fprintf(stderr,"non numeric parameter at process id\n");
 	  return -1;
 	}
     }
