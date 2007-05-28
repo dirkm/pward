@@ -57,7 +57,7 @@ int main(int argc,const char* argv[])
 {
   _Bool verbose=0;
   _Bool batch=0;
-  char* cmd="";
+  const char* cmd="";
   size_t running=0;
 
   _Bool stopCondition=0;
