@@ -11,47 +11,49 @@
 #include <sys/types.h>
 
 /* TODO */
+/* added functionality */
 
 /* wait for process, socket ... */
 /* verbose, terse */
 
 /* TODO */
+/* add implementations*/
+
 /* explore se-linux for process tracking */
 /* explore ptrace for process tracking */
 
 /* tried but failed */
-/* attempted BSD process accounting but turned out ugly */
+/* attempted BSD process accounting but turned out ugly,
+   because of huge file that monitors every process in the system +
+   required root-access to start monitoring */
 
 static void
 print_usage(const char* name)
 {
   printf(
 "%1$s: version "PACKAGE_VERSION" \n"
-"usage: %1$s -hv [-f] | [-r running_procs | -s stopped_procs]\n"
-"\t\t-e cmd_at_exit -i interval_time\n"
-"\trunning_procs: stop if only n running processes are: (default 0)\n"
-"\tstopped_procs: stop if n processes are stopped: (default 1)\n"
+"usage: %1$s -h [-v] [-b] | [-r(running_procs) | -s(stopped_procs)]\n"
+"\t\t[-e\"cmd_at_exit\"] [-iinterval_time]\n"
+"\trunning_procs: stop if no more than n processes are left: (default 0)\n"
+"\tstopped_procs: stop if at least n processes are stopped: (default 1)\n"
 "\tcmd_at_exit: command to be executed if treshold met\n"
-"\tinterval_time: polling interval\n",name);
+"\tinterval_time: polling interval, default is 1 s\n"
+"\t-v: be verbose about monitored processes\n"
+"\t-b: disable some sanity checks for batch mode\n"
+"\t-h: print this help message\n",name);
 }
 
-#define NOT_NUMBER -1
-
-static 
-int convert_to_number(const char* arg,void* number)
-{
-  errno = 0;
-  char* endptr;
-  long result=
-  result=strtol(arg,&endptr, 10);
-  
-  if (((errno == ERANGE) && (result == LONG_MAX || result == LONG_MIN))
-      ||((errno != 0) && (result == 0))
-      ||(*endptr!='\0'))
-    return NOT_NUMBER;
-  *((long*)number)=result;
-  return 0;
-}
+#define CHECKED_STRTOX(func,success,result,arg)				\
+  {									\
+    errno=0;								\
+    char* endptr;							\
+    result=func(arg,&endptr,10);					\
+    if ((errno == ERANGE) || (errno == EINVAL)				\
+	||(*endptr!='\0'))						\
+      success=0;							\
+    else								\
+      success=1;							\
+  }
 
 int main(int argc,const char* argv[])
 {
@@ -61,9 +63,9 @@ int main(int argc,const char* argv[])
   size_t running=0;
 
   _Bool stopCondition=0;
-  size_t stopped=0;
-  int nOptions=0;
-  int nInterval=1;
+  _Bool success;
+  size_t stopped=1;
+  int nInterval=1; // seconds
 
   while(1)
     {
@@ -80,11 +82,10 @@ int main(int argc,const char* argv[])
 	};
     
       int c = getopt_long(argc,(char* const*)argv, "vhfr::s::e:bi:",
-		       long_options,NULL);
+			  long_options,NULL);
       if(c==-1)
 	break;
 
-      ++nOptions;
       switch(c)
 	{
 	case 'v':
@@ -92,27 +93,31 @@ int main(int argc,const char* argv[])
 	  break;
 	case 'h':
 	  print_usage(argv[0]);
-	  exit(-1);
+	  return -1;
 	case 'r':
 	  if(optarg!=NULL)
-	    if(convert_to_number(optarg,&running))
-	      {
-		fprintf(stderr,"non numeric parameter as number of running processes");
-		return -1;
-	      }
+	    {
+	      CHECKED_STRTOX(strtoul,success,running,optarg);
+	      if(!success)
+		{
+		  fprintf(stderr,"non numeric parameter: '%s'"
+			  "as number of running processes",optarg);
+		  return -1;
+		}
+	    }
 	  break;
 	case 's':
 	  stopCondition=1;
 	  if(optarg!=NULL)
 	    {
-	      if(convert_to_number(optarg,&stopped))
+	      CHECKED_STRTOX(strtoul,success,stopped,optarg);
+	      if(!success)
 		{
-		  fprintf(stderr,"non numeric parameter as number as stopped processes\n");
+		  fprintf(stderr,"non numeric parameter: '%s'"
+			  "as number as stopped processes\n",optarg);
 		  return -1;
 		}
 	    }
-	  else
-	    stopped=1;
 	  break;
 	case 'e':
 	  if(optarg!=NULL) 
@@ -127,16 +132,18 @@ int main(int argc,const char* argv[])
 	  batch=1;
 	  break;
 	case 'i':
-	  if(convert_to_number(optarg,&nInterval))
+	  CHECKED_STRTOX(strtoul,success,stopped,optarg);
+	  if(!success)
 	    {
-	      fprintf(stderr,"non numeric parameter as interval time\n");
+	      fprintf(stderr,"non numeric parameter: '%s'"
+		      "as interval time\n",optarg);
 	      return -1;
 	    }
 	  break;
 	}
     }
 
-  int nLastOptionIndex=nOptions+1; /* exclude program-name */
+  int nLastOptionIndex=optind;
   size_t nProcsInit=argc-nLastOptionIndex;
 
   /* recalculate 'stop' in terms of number of running processes */
@@ -156,18 +163,21 @@ int main(int argc,const char* argv[])
   pid_t pids[nProcsInit];
   for(int i=0;i<nProcsInit;++i)
     {
-      if(convert_to_number(argv[nLastOptionIndex+i],pids+i))
+      CHECKED_STRTOX(strtoul,success,pids[i],argv[nLastOptionIndex+i]);
+      if(!success)
 	{
-	  fprintf(stderr,"non numeric parameter at process id\n");
+	  fprintf(stderr,"non numeric parameter: '%s'"
+		  "as process id\n",argv[nLastOptionIndex+i]);
 	  return -1;
 	}
     }
   
   int result=proc_observe_processes(nProcsInit,pids,running,batch,verbose,nInterval);
   if(result)
-    exit(result);
+    return result;
 
   if(*cmd!='\x0')
     system(cmd);
+
   return 0;
 }
