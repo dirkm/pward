@@ -49,6 +49,7 @@ print_usage(const char* name)
     char* endptr;							\
     result=func(arg,&endptr,10);					\
     if ((errno == ERANGE) || (errno == EINVAL)				\
+	||(endptr==arg)							\
 	||(*endptr!='\0'))						\
       success=0;							\
     else								\
@@ -172,7 +173,8 @@ int main(int argc,const char* argv[])
 	}
     }
   
-  int result=proc_observe_processes(nProcsInit,pids,running,batch,verbose,nInterval);
+  int result=proc_observe_processes
+    (nProcsInit,pids,running,batch,verbose,nInterval);
   if(result)
     return result;
 
