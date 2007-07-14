@@ -125,7 +125,7 @@ int main(int argc,const char* argv[])
 	    cmd=strdupa(optarg);
 	  else
 	    {
-	      printf("missing argument to command option\n");
+	      fprintf(stderr,"missing argument to option 'exec'\n");
 	      return -1;
 	    }
 	  break;
@@ -177,9 +177,15 @@ int main(int argc,const char* argv[])
     (nProcsInit,pids,running,batch,verbose,nInterval);
   if(result)
     return result;
+  
+  if(verbose)
+    printf("condition met\n");
 
   if(*cmd!='\x0')
-    system(cmd);
-
+    {
+      if(verbose)
+	printf("executing command: '%s'\n",cmd);
+      system(cmd);
+    }
   return 0;
 }
