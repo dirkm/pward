@@ -34,13 +34,16 @@ print_usage(const char* name)
 "%1$s: version "PACKAGE_VERSION" \n"
 "usage: %1$s [-h] | procs* [-v] [-b] [-r(running_procs) | -s(stopped_procs)]\n"
 "\t\t[-e\"cmd_at_exit\"] [-iinterval_time]\n"
-"\trunning_procs: stop if no more than n processes are left: (default 0)\n"
-"\tstopped_procs: stop if at least n processes are stopped: (default 1)\n"
+"\trunning_procs: stop if no more than n processes are left (default 0)\n"
+"\tstopped_procs: stop if at least n processes are stopped (default 1)\n"
 "\tcmd_at_exit: command to be executed if treshold met\n"
-"\tinterval_time: polling interval, default is 1 s\n"
+"\tinterval_time: polling interval in seconds (default 1)\n"
 "\t-v: be verbose about monitored processes\n"
-"\t-b: disable some sanity checks for batch mode\n"
-"\t-h: print this help message\n",name);
+"\t-b: disable some sanity checks for scripting\n"
+"\t-h: print this help message\n"
+"\n"
+"\tdefault: run until all processed ended\n"
+,name);
 }
 
 #define CHECKED_STRTOX(func,success,result,arg)				\
