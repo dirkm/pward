@@ -88,7 +88,7 @@ int main(int argc,const char* argv[])
       int c = getopt_long(argc,(char* const*)argv, "vhfr::s::e:bi:",
 			  long_options,NULL);
       if(c==-1)
-	break;
+	return -1;
 
       switch(c)
 	{
