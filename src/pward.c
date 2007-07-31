@@ -67,7 +67,6 @@ int main(int argc,const char* argv[])
   size_t running=0;
 
   _Bool stopCondition=0;
-  _Bool success;
   size_t stopped=1;
   int nInterval=1; // seconds
 
@@ -88,7 +87,7 @@ int main(int argc,const char* argv[])
       int c = getopt_long(argc,(char* const*)argv, "vhfr::s::e:bi:",
 			  long_options,NULL);
       if(c==-1)
-	return -1;
+	break;
 
       switch(c)
 	{
@@ -101,6 +100,7 @@ int main(int argc,const char* argv[])
 	case 'r':
 	  if(optarg!=NULL)
 	    {
+	      _Bool success;
 	      CHECKED_STRTOX(strtoul,success,running,optarg);
 	      if(!success)
 		{
@@ -114,6 +114,7 @@ int main(int argc,const char* argv[])
 	  stopCondition=1;
 	  if(optarg!=NULL)
 	    {
+	      _Bool success;
 	      CHECKED_STRTOX(strtoul,success,stopped,optarg);
 	      if(!success)
 		{
@@ -136,14 +137,19 @@ int main(int argc,const char* argv[])
 	  batch=1;
 	  break;
 	case 'i':
-	  CHECKED_STRTOX(strtoul,success,stopped,optarg);
-	  if(!success)
-	    {
-	      fprintf(stderr,"non numeric parameter: '%s'"
-		      "as interval time\n",optarg);
-	      return -1;
-	    }
-	  break;
+	  {
+	    _Bool success;
+	    CHECKED_STRTOX(strtoul,success,stopped,optarg);
+	    if(!success)
+	      {
+		fprintf(stderr,"non numeric parameter: '%s'"
+			"as interval time\n",optarg);
+		return -1;
+	      }
+	    break;
+	  }
+	case '?':
+	  return -1; /* missing opt argument */
 	}
     }
 
@@ -167,6 +173,7 @@ int main(int argc,const char* argv[])
   pid_t pids[nProcsInit];
   for(int i=0;i<nProcsInit;++i)
     {
+      _Bool success;
       CHECKED_STRTOX(strtoul,success,pids[i],argv[nLastOptionIndex+i]);
       if(!success)
 	{
