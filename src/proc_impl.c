@@ -95,9 +95,12 @@ int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
 	  --nProcs;	  
 	  if(startTimes[p-pids]==buf.start_time)
 	    {
+	      /* pids are stored in the order that they are found;
+		 we assume that the next run returns results in the same order
+		 this should speed up our linear array lookup */
 	      SWAP(pid_t,p,pids);
 	      SWAP(unsigned long long,startTimes,startTimes+(p-pids));
-	      /* entry can only be found once, so increment base value */
+	      /* an entry can only be found once, so increment base value */
 	      ++pids,++startTimes;
 	      if((pids-pidsstart)>treshold)
 		{
@@ -138,7 +141,8 @@ proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,_Bool batch,
   size_t nProcs=init_check_procs(nProcsInit,pids,startTimes,verbose);
   if(!batch && !nProcs)
     {
-      fprintf(stderr, "no processes found, bailing out\n");
+      if(verbose)
+	fprintf(stderr, "no processes found, bailing out\n");
       return -4;
     }
 
