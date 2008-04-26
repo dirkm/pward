@@ -35,7 +35,7 @@ print_usage(const char* name)
 {
   printf(
 "%1$s: version "PACKAGE_VERSION" \n"
-"usage: %1$s [-h] | procs* [-v] [-b] [-r(running_procs) | -s(stopped_procs)]\n"
+"usage: %1$s [-h] | { pids } [-v] [-b] [-r(running_procs) | -s(stopped_procs)]\n"
 "\t\t[-e\"cmd_at_exit\"] [-iinterval_time]\n"
 "\trunning_procs: stop if no more than n processes are left (default 0)\n"
 "\tstopped_procs: stop if at least n processes are stopped (default 1)\n"
@@ -45,7 +45,7 @@ print_usage(const char* name)
 "\t-b: disable some sanity checks for scripting\n"
 "\t-h: print this help message\n"
 "\n"
-"\tdefault: run until all processed ended\n"
+"\tdefault: run until all specified processes ended\n"
 ,name);
 }
 
