@@ -2,6 +2,7 @@
 #include "proc_impl.h"
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <getopt.h>
@@ -64,12 +65,12 @@ print_usage(const char* name)
 
 int main(int argc,const char* argv[])
 {
-  _Bool verbose=0;
-  _Bool batch=0;
+  bool verbose=false;
+  bool batch=false;
   const char* cmd="";
   size_t running=0;
 
-  _Bool stopCondition=0;
+  bool stopCondition=false;
   size_t stopped=1;
   int nInterval=1; // seconds
 
@@ -103,7 +104,7 @@ int main(int argc,const char* argv[])
 	case 'r':
 	  if(optarg!=NULL)
 	    {
-	      _Bool success;
+	      bool success;
 	      CHECKED_STRTOX(strtoul,success,running,optarg);
 	      if(!success)
 		{
@@ -117,7 +118,7 @@ int main(int argc,const char* argv[])
 	  stopCondition=1;
 	  if(optarg!=NULL)
 	    {
-	      _Bool success;
+	      bool success;
 	      CHECKED_STRTOX(strtoul,success,stopped,optarg);
 	      if(!success)
 		{
@@ -141,7 +142,7 @@ int main(int argc,const char* argv[])
 	  break;
 	case 'i':
 	  {
-	    _Bool success;
+	    bool success;
 	    CHECKED_STRTOX(strtoul,success,stopped,optarg);
 	    if(!success)
 	      {
@@ -176,7 +177,7 @@ int main(int argc,const char* argv[])
   pid_t pids[nProcsInit];
   for(int i=0;i<nProcsInit;++i)
     {
-      _Bool success;
+      bool success;
       CHECKED_STRTOX(strtoul,success,pids[i],argv[nLastOptionIndex+i]);
       if(!success)
 	{

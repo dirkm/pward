@@ -2,6 +2,7 @@
 #include <search.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 const char proc_dump_header[]="   PID    STIME CMD\n";
 const char proc_dump_format[]="%6d %8llu %s\n";
@@ -28,7 +29,7 @@ void cleanup_proc(proc_t* p)
 
 static
 int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
-		     _Bool verbose)
+		     bool verbose)
 {
   PROCTAB* ptp=openproc(PROC_FILLARG|PROC_FILLSTAT);
   if(!ptp)
@@ -75,7 +76,7 @@ int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
 
 static
 int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
-		size_t treshold, _Bool verbose)
+		size_t treshold, bool verbose)
 {
   PROCTAB* ptp=openproc(PROC_FILLSTAT);
   if(!ptp)
@@ -129,8 +130,8 @@ int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
 }
 
 int
-proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,_Bool batch,
-		       _Bool verbose, int nInterval)
+proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,bool batch,
+		       bool verbose, int nInterval)
 {
   unsigned long long startTimes[nProcsInit];
   for(int i=0;i<nProcsInit;++i)
