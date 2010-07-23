@@ -71,8 +71,7 @@ int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
 
 /* return-value:  */
 /*   Normally: number of processes still found */
-/*   if treshold not met: overestimate ->  
-     number of processes still to be considered  */
+/*   if treshold is not met: overestimate (number of processes still to be considered)  */
 
 static
 int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
@@ -97,7 +96,7 @@ int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
 	  if(startTimes[p-pids]==buf.start_time)
 	    {
 	      /* pids are stored in the order that they are found;
-		 we assume that the next run returns results in the same order
+		 we assume that the next run will returns results in the same order
 		 this should speed up our linear array lookup */
 	      SWAP(pid_t,p,pids);
 	      SWAP(unsigned long long,startTimes,startTimes+(p-pids));
@@ -152,7 +151,7 @@ proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,bool batch,
       nProcs=check_procs(nProcs,pids,startTimes,running,verbose);
       if(nProcs<=running)
 	break;
-      sleep(nInterval); // TODO: not sure if absolute wait is desirable
+      sleep(nInterval); // TODO: maybe time has to include time taken for check_procs
     }
 
   return 0;
