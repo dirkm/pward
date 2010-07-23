@@ -32,7 +32,7 @@ AC_SUBST(LPROC)
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([limits.h stdlib.h string.h proc/readproc.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h $IPROC])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
