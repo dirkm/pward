@@ -54,7 +54,7 @@ int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
 	{
 	  SWAP(pid_t,p,pids);
 
-	  *startTimes=buf.start_time;  
+	  *startTimes=buf.start_time;
 	  --nProcs;++pids;++startTimes;
 
 	  if(verbose)
@@ -92,7 +92,7 @@ int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
 	(pid_t*)lfind(&buf.tgid,pids,&nProcs,sizeof(pid_t),cmppid);
       if(p!=NULL)
 	{
-	  --nProcs;	  
+	  --nProcs;
 	  if(startTimes[p-pids]==buf.start_time)
 	    {
 	      /* pids are stored in the order that they are found;
@@ -104,7 +104,7 @@ int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
 	      ++pids,++startTimes;
 	      if((pids-pidsstart)>treshold)
 		{
-		  pids+=nProcs; 
+		  pids+=nProcs;
 		  /* return overestimate (pretend all remaining are matches) */
 		  cleanup_proc(&buf);
 		  break;

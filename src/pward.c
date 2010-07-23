@@ -82,7 +82,7 @@ int main(int argc,const char* argv[])
             {"interval", 1, 0, 'i'},
             {0, 0, 0, 0}
          };
-    
+
       int c = getopt_long(argc,(char* const*)argv, "vhfr::s::e:bi:",
 			  long_options,NULL);
       if(c==-1)
@@ -124,7 +124,7 @@ int main(int argc,const char* argv[])
 	    }
             break;
          case 'e':
-            if(optarg!=NULL) 
+            if(optarg!=NULL)
                cmd=strdupa(optarg);
             else
 	    {
@@ -161,7 +161,7 @@ int main(int argc,const char* argv[])
       if(nProcsInit<stopped)
       {
          if(!batch)
-	    fprintf(stderr, 
+	    fprintf(stderr,
 		    "warning: requesting more stopped processes (%zu)"
 		    "than the number of processes at startup (%zu)\n",stopped,nProcsInit);
       }
@@ -181,12 +181,12 @@ int main(int argc,const char* argv[])
          return -1;
       }
    }
-  
+
    int result=proc_observe_processes
       (nProcsInit,pids,running,batch,verbose,nInterval);
    if(result)
       return result;
-  
+
    if(verbose)
       printf("condition met: %zu processes left\n", running);
 
