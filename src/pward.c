@@ -13,14 +13,8 @@
 
 /* TODO */
 /* added functionality */
-
 /* wait for process, socket ... */
-/* verbose, terse */
-
-/* TODO */
-/* add implementations*/
-
-/* explore se-linux for process tracking */
+/* add more efficient implementations*/
 /* explore ptrace for process tracking */
 
 /* tried but failed */
@@ -28,7 +22,6 @@
    because of huge file that monitors every process in the system +
    required root-access to start monitoring */
 
-/* TODO */
 /* cleanup printing to actually get tabbing right */
 
 static void
