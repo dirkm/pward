@@ -13,14 +13,14 @@
 
 /* TODO */
 /* added functionality */
-/* wait for process, socket ... */
-/* add more efficient implementations*/
-/* explore ptrace for process tracking */
+/*   wait for process, socket ... */
+/*   add more efficient implementations*/
+/*   explore ptrace for process tracking */
 
 /* tried but failed */
-/* attempted BSD process accounting but turned out ugly,
-   because of huge file that monitors every process in the system +
-   required root-access to start monitoring */
+/*   attempted BSD process accounting but turned out ugly,
+     because of huge file that monitors every process in the system +
+     required root-access to start monitoring */
 
 /* cleanup printing to actually get tabbing right */
 
@@ -162,8 +162,8 @@ int main(int argc,const char* argv[])
       {
          if(!batch)
 	    fprintf(stderr, 
-		    "warning: requesting more stopped processes "
-		    "than the number of processes at startup\n");
+		    "warning: requesting more stopped processes (%zu)"
+		    "than the number of processes at startup (%zu)\n",stopped,nProcsInit);
       }
       else if(running<nProcsInit-stopped)
          running=nProcsInit-stopped;
