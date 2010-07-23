@@ -195,7 +195,7 @@ int main(int argc,const char* argv[])
       if(verbose)
          printf("executing command: '%s'\n",cmd);
       if(!system(cmd))
-         fprintf(stderr,"could not run command '%s'",cmd);
+         fprintf(stderr,"command '%s' failed",cmd);
    }
    return 0;
 }
