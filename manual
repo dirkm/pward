@@ -3,5 +3,4 @@ libproc and libproc-dev
 example usage
 ./pward `pgrep emerge` -e"shutdown -h +10" -v -i10
 TODO:
-add check for headers in autoconf script
 run autoscan again
