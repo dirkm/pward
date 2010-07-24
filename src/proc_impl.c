@@ -7,13 +7,13 @@
 const char proc_dump_header[]="   PID    STIME CMD\n";
 const char proc_dump_format[]="%6d %8llu %s\n";
 
-static
+static inline
 int cmppid(const void* l, const void* r)
 {
    return *((pid_t*)l)-*((pid_t*)r);
 }
 
-static
+static inline
 void cleanup_proc(proc_t* p)
 {
    if (p->cmdline)

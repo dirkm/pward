@@ -186,7 +186,7 @@ int main(int argc,const char* argv[])
       if(verbose)
          printf("executing command: '%s'\n",cmd);
       if(!system(cmd))
-         fprintf(stderr,"command '%s' failed",cmd);
+         fprintf(stderr,"command '%s' failed to spawn",cmd);
    }
    return 0;
 }
