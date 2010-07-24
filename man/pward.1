@@ -20,13 +20,14 @@ It can be configured to execute a specified command before stopping.
 .SH OPTIONS
 .TP
 \fB\-r\fR, \fB\-\-running\fR=n
-stop monitoring when no more than n processes are left (default 0)
+stop monitoring when no more than n processes are still running (default 0)
 .TP
 \fB\-s\fR, \fB\-\-stopped\fR=n
 stop monitoring when at least n processes have stopped (default 1)
 .TP
-\fB\-e\fR, \fB\-\-exec\fR="cmd"
-command to execute when treshold is met
+\fB\-e\fR, \fB\-\-exec\fR=\fIcommand\fR
+Execute \fIcommand\fR after the treshold is met, and before pward is stopped.
+The command  is executed in the starting directory.
 .TP
 \fB\-v\fR, \fB\-\-verbose\fR
 summarize monitored processes at startup.
@@ -36,6 +37,9 @@ don't perform sanity checks at input. This can be useful when invoked from a scr
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 print a help message at startup
+.TP
+\fB[PID]\fR
+space separated list of process-ids to be monitored. 
 
 .SH FILES
 
@@ -51,20 +55,20 @@ The input parameter is not a number
 
 command failed
 .RS
-the specified command failed to execute
+the command int the -exec option failed to execute
 .RE
 
 .SH BUGS
 pward checks processes by polling the proc-table.
-This is portable, but a better implementation using modern kernel features is needed.
+This is portable, but a better implementation using modern kernel features is badly needed.
 
 .SH EXAMPLES
 .B pward `pgrep emerge` -v -i10 -e"shutdown -h +10"
 
 Shuts down the machine 10 minutes after emerge finished.
-Some info is dumped to the console at startup.
+Some info about the monitored processes is dumped to the console at startup.
 The polling interval is set to 10 seconds.
-This has to be run as root to get required permissions.
+The user needs the rights to shutdown the machine for this to work.
 
 .SH AUTHOR
 Dirk Moermans <dirkmoermans @ gmail.com>

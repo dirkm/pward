@@ -16,15 +16,16 @@ print_usage(const char* name)
 {
    printf(
       "%1$s: [OPTION]... [PID]... \n"
-      "  -r, --running=n: stop if no more than n processes are left (default 0)\n"
+      "  -r, --running=n: stop if no more than n processes are still running (default 0)\n"
       "  -s, --stopped=n: stop if at least n processes have stopped (default 1)\n"
       "  -e, --exec=\"cmd\": command to execute when treshold is met\n"
       "  -i, --interval=n: polling interval in seconds (default 1)\n"
       "  -v, --verbose: summarize monitored processes at startup\n"
       "  -b, --batch: no sanity checks on input (useful when scripting)\n"
       "  -h, --help: print this help message\n\n"
-      "default behaviour: run until all specified processes are ended\n\n"
-      "This is version "PACKAGE_VERSION" \n",
+      "  [PID]: space separated list of process-ids to be monitored.\n\n"
+      "default behaviour: run until all specified processes have died\n"
+      "pward-version: "PACKAGE_VERSION" \n",
       name);
 }
 
@@ -140,6 +141,11 @@ int main(int argc,const char* argv[])
    int nLastOptionIndex=optind;
    size_t nProcsInit=argc-nLastOptionIndex;
 
+   if(!batch)
+   {
+      fprintf(stderr,
+              "WARNING: no processes are monitored\n\n");
+   }
    /* recalculate 'stop' in terms of number of running processes */
    if(stopCondition)
    {
@@ -147,7 +153,7 @@ int main(int argc,const char* argv[])
       {
          if(!batch)
 	    fprintf(stderr,
-		    "warning: requesting more stopped processes (%zu)"
+		    "WARNING: requesting more stopped processes (%zu)"
 		    "than the number of processes at startup (%zu)\n",stopped,nProcsInit);
       }
       else if(running<nProcsInit-stopped)
