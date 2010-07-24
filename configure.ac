@@ -1,9 +1,10 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.61)
-AC_INIT(pward,0.5,dirkmoermans@gmail.com)
+AC_PREREQ(2.65)
+AC_INIT([pward],[0.5],[dirkmoermans@gmail.com])
 AM_INIT_AUTOMAKE
-AC_OUTPUT(Makefile src/Makefile)
+AC_CONFIG_FILES([Makefile src/Makefile])
+AC_OUTPUT
 AC_CONFIG_SRCDIR([src/proc_impl.c])
 
 # Checks for programs.
