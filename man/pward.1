@@ -1,7 +1,7 @@
 .\" groff -man -Tascii pward.1
 .TH PWARD 1 "July 2010" Linux "User Manuals"
 .SH NAME
-pward \- monitor the lifecycle of a  set of running processes
+pward \- monitor the lifecycle of a set of running processes.
 .SH SYNOPSIS
 .B pward
 [
@@ -56,14 +56,14 @@ the specified command failed to execute
 
 .SH BUGS
 pward checks processes by polling the proc-table.
-This is portable but a better implementation using modern kernel features is needed.
+This is portable, but a better implementation using modern kernel features is needed.
 
 .SH EXAMPLES
 .B pward `pgrep emerge` -v -i10 -e"shutdown -h +10"
 
 Shuts down the machine 10 minutes after emerge finished.
-Some manual feedback is provided at startup.
-The interval polling is set to 10 seconds.
+Some info is dumped to the console at startup.
+The polling interval is set to 10 seconds.
 This has to be run as root to get required permissions.
 
 .SH AUTHOR
