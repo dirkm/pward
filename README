@@ -3,7 +3,7 @@ PWARD(1)			 User Manuals			      PWARD(1)
 
 
 NAME
-       pward - monitor the lifecycle of a set processes.
+       pward - monitor the lifecycle of a set of processes.
 
 SYNOPSIS
        pward [ OPTION ] ... [ PID ] ...
@@ -54,16 +54,17 @@ DIAGNOSTICS
 
 
 BUGS
-       pward checks processes by polling the proc-table.  This is portable but
-       an implementation with modern kernel features would be more efficient.
+       pward  checks  processes  by polling the proc-table.  This is portable,
+       but an implementation with modern kernel features would be  more  effi-
+       cient.
 
 
 EXAMPLES
        pward `pgrep emerge` -v -i10 -e"shutdown -h +10"
 
-       Shuts down the machine 10 minutes after	emerge	finished.   Some  info
+       Shuts  down  the  machine  10 minutes after emerge finished.  Some info
        about the monitored processes is dumped to the console at startup.  The
-       polling interval is set to 10 seconds.  The user needs  the  rights  to
+       polling	interval  is  set to 10 seconds.  The user needs the rights to
        shutdown the machine for this to work.
 
 
