@@ -1,0 +1,67 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH PWARD 1 "July 2010" Linux "User Manuals"
+.SH NAME
+pward \- monitor the lifecycle of a  set of running processes
+.SH SYNOPSIS
+.B pward 
+[
+.I OPTION
+] ... [
+.I 
+PID
+] ...
+.SH DESCRIPTION
+.B pward
+monitors a set of processes given as command-line arguments. By default, 
+pward stops when all specified processes have died.
+Optionnally, it stops when a specified number of processes has stopped, 
+or when less than a specified number of processes is still running.
+It can be configured as well to execute a specified command instead of stopping.
+.SH OPTIONS
+.TP
+\fB\-r\fR, \fB\-\-running\fR=n
+stop monitoring when no more than n processes are left (default 0)
+.TP
+\fB\-s\fR, \fB\-\-stopped\fR=n
+stop monitoring when at least n processes are stopped (default 1)
+.TP
+\fB\-e\fR, \fB\-\-exec\fR="cmd"
+command to execute when treshold is met
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+describe monitored processes at startup.
+.TP
+\fB\-b\fR, \fB\-\-batch\fR
+don't perform sanity checks at input. This can be useful when invoked from a script
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+print a help message at startup
+
+.SH FILES
+
+.SH ENVIRONMENT
+
+.SH DIAGNOSTICS
+The following diagnostics may be issued on stderr:
+ 
+non numeric parameter
+.RS
+The input parameter is not a number
+.RE
+
+command failed
+.RS
+the specified command failed to execute
+.RE
+.SH BUGS
+pward checks processes by polling the proc-table.
+This is portable but not very performant.
+A better implementation using modern kernel features is needed.
+.SH AUTHOR
+Dirk Moermans <dirkmoermans @ gmail.com>
+.SH "SEE ALSO"
+.BR pgrep (1),
+.BR pkill (1),
+.BR top (1)
