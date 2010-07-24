@@ -1,0 +1,2 @@
+pward depends on libproc
+pward is only tested using gcc4 and needs a C99-compiler

@@ -11,19 +11,6 @@
 #include <limits.h>
 #include <sys/types.h>
 
-/* TODO */
-/* added functionality */
-/*   wait for process, socket ... */
-/*   add more efficient implementations*/
-/*   explore ptrace for process tracking */
-
-/* tried but failed */
-/*   attempted BSD process accounting but turned out ugly,
-     because of huge file that monitors every process in the system +
-     required root-access to start monitoring */
-
-/* cleanup printing to actually get tabbing right */
-
 static void
 print_usage(const char* name)
 {

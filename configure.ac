@@ -11,7 +11,7 @@ AC_PROG_CC
 
 # Checks for libraries.
 
-AC_ARG_WITH([proc],
+AC_ARG_WITH([proc-lib],
   [  --with-proc-lib=proc
                           used proc library],
   [if test x"$withval" != x ; then

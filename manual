@@ -1,6 +1,0 @@
-dependencies
-libproc and libproc-dev
-example usage
-./pward `pgrep emerge` -e"shutdown -h +10" -v -i10
-TODO:
-run autoscan again

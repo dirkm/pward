@@ -1,0 +1,14 @@
+#-*- org -*-
+* TODO
+** cleanup configure scripts
+** write help
+** add functionality
+*** wait for process, socket ... 
+*** add more efficient implementations instead of polling the proc-table
+*** explore ptrace for process tracking 
+*** cleanup printing to actually get tabbing right
+*** find a way to pass pids of still-running / dead pids to the executed program 
+** tried but failed
+attempted BSD process accounting but turned out ugly,
+because of huge file that monitors every process in the system +
+required root-access to start monitoring
