@@ -1,5 +1,7 @@
 following commands have to be executed in the root directory of the project  
-to get valid configure scripts
+to get valid configure scripts. 
+
+This is only needed when checking out the project. The dist-file contains a valid configure script.
 
 $ aclocal
 $ automake --add-missing
