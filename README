@@ -1,0 +1,79 @@
+PWARD(1)                         User Manuals                         PWARD(1)
+
+
+
+NNAAMMEE
+       pward - monitor the lifecycle of a set of running processes.
+
+SSYYNNOOPPSSIISS
+       ppwwaarrdd [ _O_P_T_I_O_N ] ... [ _P_I_D ] ...
+
+DDEESSCCRRIIPPTTIIOONN
+       ppwwaarrdd  monitors  a  set  of  processes  given  at  the command-line. By
+       default, pward stops when all specified processes have  died.   Option-
+       nally,  it  stops  when a specified number of processes has stopped, or
+       when less than a specified number of processes is  still  running.   It
+       can be configured to execute a specified command before stopping.
+
+OOPPTTIIOONNSS
+       --rr, ----rruunnnniinngg=n
+              stop  monitoring when no more than n processes are still running
+              (default 0)
+
+       --ss, ----ssttooppppeedd=n
+              stop monitoring when at least n processes have stopped  (default
+              1)
+
+       --ee, ----eexxeecc=_c_o_m_m_a_n_d
+              Execute  _c_o_m_m_a_n_d  after the treshold is met, and before pward is
+              stopped.  The command  is executed in the starting directory.
+
+       --vv, ----vveerrbboossee
+              summarize monitored processes at startup.
+
+       --bb, ----bbaattcchh
+              don't perform sanity checks at input. This can  be  useful  when
+              invoked from a script
+
+       --hh, ----hheellpp
+              print a help message at startup
+
+       [[PPIIDD]]  space separated list of process-ids to be monitored.
+
+
+FFIILLEESS
+EENNVVIIRROONNMMEENNTT
+DDIIAAGGNNOOSSTTIICCSS
+       The following diagnostics may be issued on stderr:
+
+       non numeric parameter
+              The input parameter is not a number
+
+       command failed
+              the command in the -exec option failed to execute
+
+
+BBUUGGSS
+       pward  checks  processes  by polling the proc-table.  This is portable,
+       but a better implementation  using  modern  kernel  features  is  badly
+       needed.
+
+
+EEXXAAMMPPLLEESS
+       ppwwaarrdd ``ppggrreepp eemmeerrggee`` --vv --ii1100 --ee""sshhuuttddoowwnn --hh ++1100""
+
+       Shuts  down  the  machine  10 minutes after emerge finished.  Some info
+       about the monitored processes is dumped to the console at startup.  The
+       polling  interval  is  set to 10 seconds.  The user needs the rights to
+       shutdown the machine for this to work.
+
+
+AAUUTTHHOORR
+       Dirk Moermans <dirkmoermans @ gmail.com>
+
+SSEEEE AALLSSOO
+       ppggrreepp(1), ppkkiillll(1), ttoopp(1)
+
+
+
+Linux                              July 2010                          PWARD(1)
