@@ -2,7 +2,7 @@
 #include <search.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
+#include <proc_impl.h>
 
 const char proc_dump_header[]="   PID    STIME CMD\n";
 const char proc_dump_format[]="%6d %8llu %s\n";
