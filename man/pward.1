@@ -3,27 +3,27 @@
 .SH NAME
 pward \- monitor the lifecycle of a  set of running processes
 .SH SYNOPSIS
-.B pward 
+.B pward
 [
 .I OPTION
 ] ... [
-.I 
+.I
 PID
 ] ...
 .SH DESCRIPTION
 .B pward
-monitors a set of processes given as command-line arguments. By default, 
+monitors a set of processes given at the command-line. By default,
 pward stops when all specified processes have died.
-Optionnally, it stops when a specified number of processes has stopped, 
+Optionnally, it stops when a specified number of processes has stopped,
 or when less than a specified number of processes is still running.
-It can be configured as well to execute a specified command instead of stopping.
+It can be configured to execute a specified command before stopping.
 .SH OPTIONS
 .TP
 \fB\-r\fR, \fB\-\-running\fR=n
 stop monitoring when no more than n processes are left (default 0)
 .TP
 \fB\-s\fR, \fB\-\-stopped\fR=n
-stop monitoring when at least n processes are stopped (default 1)
+stop monitoring when at least n processes have stopped (default 1)
 .TP
 \fB\-e\fR, \fB\-\-exec\fR="cmd"
 command to execute when treshold is met
@@ -43,7 +43,7 @@ print a help message at startup
 
 .SH DIAGNOSTICS
 The following diagnostics may be issued on stderr:
- 
+
 non numeric parameter
 .RS
 The input parameter is not a number
@@ -53,9 +53,19 @@ command failed
 .RS
 the specified command failed to execute
 .RE
+
 .SH BUGS
 pward checks processes by polling the proc-table.
 This is portable but a better implementation using modern kernel features is needed.
+
+.SH EXAMPLES
+.B pward `pgrep emerge` -v -i10 -e"shutdown -h +10"
+
+Shuts down the machine 10 minutes after emerge finished.
+Some manual feedback is provided at startup.
+The interval polling is set to 10 seconds.
+This has to be run as root to get required permissions.
+
 .SH AUTHOR
 Dirk Moermans <dirkmoermans @ gmail.com>
 .SH "SEE ALSO"

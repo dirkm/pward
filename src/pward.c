@@ -17,7 +17,7 @@ print_usage(const char* name)
    printf(
       "%1$s: [OPTION]... [PID]... \n"
       "  -r, --running=n: stop if no more than n processes are left (default 0)\n"
-      "  -s, --stopped=n: stop if at least n processes are stopped (default 1)\n"
+      "  -s, --stopped=n: stop if at least n processes have stopped (default 1)\n"
       "  -e, --exec=\"cmd\": command to execute when treshold is met\n"
       "  -i, --interval=n: polling interval in seconds (default 1)\n"
       "  -v, --verbose: summarize monitored processes at startup\n"

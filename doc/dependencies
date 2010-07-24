@@ -1,2 +1,2 @@
-pward depends on libproc
-pward is only tested using gcc4 and needs a C99-compiler
+pward depends on libproc.
+pward is written in C99 and only tested with gcc4.
