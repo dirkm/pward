@@ -1,0 +1,7 @@
+following commands have to be executed in the root directory 
+to get valid configure scripts on my machine
+
+$ aclocal
+$ automake --add-missing
+$ autoconf
+
