@@ -141,7 +141,7 @@ int main(int argc,const char* argv[])
    int nLastOptionIndex=optind;
    size_t nProcsInit=argc-nLastOptionIndex;
 
-   if(nProcsInit==0 && !batch)
+   if(!nProcsInit && !batch)
    {
       fprintf(stderr,
               "WARNING: no processes are monitored\n\n");
