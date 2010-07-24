@@ -37,7 +37,7 @@ int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
    if(!ptp)
    {
       fprintf(stderr, "Error: cannot access /proc.\n");
-      exit -1;
+      exit(-1);
    }
 
    if(verbose)
@@ -83,7 +83,7 @@ int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
    if(!ptp)
    {
       fprintf(stderr, "Error: cannot access /proc.\n");
-      exit -2;
+      exit(-2);
    }
 
    pid_t* pidsstart=pids;

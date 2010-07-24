@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = src
 
-man_MANS = man/pward.1
+man1_MANS = man/pward.man
 
-EXTRA_DIST = LICENSE
+EXTRA_DIST = LICENSE man/pward.man
