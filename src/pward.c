@@ -21,6 +21,7 @@ print_usage(const char* name)
       "  -e, --exec=\"cmd\": command to be executed if treshold met\n"
       "  -i, --interval=n: polling interval in seconds (default 1)\n"
       "  -v, --verbose: be verbose about monitored processes\n"
+      "  -b, --batch: no sanity checks on input (useful when scripting)\n"
       "  -h, --help: print this help message\n\n"
       "default behaviour: run until all specified processes are ended\n\n"
       "This is version "PACKAGE_VERSION" \n",
