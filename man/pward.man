@@ -2,7 +2,7 @@
 .\" groff -man -Tascii pward.1 | col -b
 .TH PWARD 1 "July 2010" Linux "User Manuals"
 .SH NAME
-pward \- monitor the lifecycle of a set processes.
+pward \- monitor the lifecycle of a set of processes.
 .SH SYNOPSIS
 .B pward
 [
@@ -61,7 +61,7 @@ the command in the -exec option failed to execute.
 
 .SH BUGS
 pward checks processes by polling the proc-table.
-This is portable but an implementation with modern kernel features would be more efficient.
+This is portable, but an implementation with modern kernel features would be more efficient.
 
 .SH EXAMPLES
 .B pward `pgrep emerge` -v -i10 -e"shutdown -h +10"
