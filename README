@@ -3,7 +3,7 @@ PWARD(1)			 User Manuals			      PWARD(1)
 
 
 NAME
-       pward - monitor the lifecycle of a set of running processes.
+       pward - monitor the lifecycle of a set processes.
 
 SYNOPSIS
        pward [ OPTION ] ... [ PID ] ...
@@ -33,10 +33,10 @@ OPTIONS
 
        -b, --batch
 	      don't perform sanity checks at input. This can  be  useful  when
-	      invoked from a script
+	      invoked from a script.
 
        -h, --help
-	      print a help message at startup
+	      print a help message at startup.
 
        [PID]  space separated list of process-ids to be monitored.
 
@@ -47,24 +47,23 @@ DIAGNOSTICS
        The following diagnostics may be issued on stderr:
 
        non numeric parameter
-	      The input parameter is not a number
+	      The input parameter is not a number.
 
        command failed
-	      the command in the -exec option failed to execute
+	      the command in the -exec option failed to execute.
 
 
 BUGS
-       pward  checks  processes  by polling the proc-table.  This is portable,
-       but a better implementation  using  modern  kernel  features  is  badly
-       needed.
+       pward checks processes by polling the proc-table.  This is portable but
+       an implementation with modern kernel features would be more efficient.
 
 
 EXAMPLES
        pward `pgrep emerge` -v -i10 -e"shutdown -h +10"
 
-       Shuts  down  the  machine  10 minutes after emerge finished.  Some info
+       Shuts down the machine 10 minutes after	emerge	finished.   Some  info
        about the monitored processes is dumped to the console at startup.  The
-       polling	interval  is  set to 10 seconds.  The user needs the rights to
+       polling interval is set to 10 seconds.  The user needs  the  rights  to
        shutdown the machine for this to work.
 
 
