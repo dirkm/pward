@@ -1,5 +1,5 @@
-following commands have to be executed in the root directory 
-to get valid configure scripts on my machine
+following commands have to be executed in the root directory of the project  
+to get valid configure scripts
 
 $ aclocal
 $ automake --add-missing
