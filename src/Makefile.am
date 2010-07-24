@@ -1,5 +1,5 @@
-AM_CFLAGS=-std=c99 -Wall -O2 
-AM_LDFLAGS= -I@IPROC_DIR@
+AM_CFLAGS=-std=c99 -Wall -O2 -I@IPROC_DIR@ 
+#AM_LDFLAGS= 
 
 bin_PROGRAMS = pward
 pward_SOURCES= pward.c proc_impl.c
