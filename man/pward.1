@@ -61,7 +61,7 @@ the command in the -exec option failed to execute
 
 .SH BUGS
 pward checks processes by polling the proc-table.
-This is portable, but a better implementation using modern kernel features is badly needed.
+This is portable but an implementation with modern kernel features would be more efficient.
 
 .SH EXAMPLES
 .B pward `pgrep emerge` -v -i10 -e"shutdown -h +10"
