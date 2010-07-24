@@ -15,19 +15,16 @@ static void
 print_usage(const char* name)
 {
    printf(
-      "%1$s: version "PACKAGE_VERSION" \n"
-      "usage: %1$s [-h] | { pids } [-v] [-b] [-r(running_procs) | -s(stopped_procs)]\n"
-      "\t\t[-e\"cmd_at_exit\"] [-iinterval_time]\n"
-      "\trunning_procs: stop if no more than n processes are left (default 0)\n"
-      "\tstopped_procs: stop if at least n processes are stopped (default 1)\n"
-      "\tcmd_at_exit: command to be executed if treshold met\n"
-      "\tinterval_time: polling interval in seconds (default 1)\n"
-      "\t-v: be verbose about monitored processes\n"
-      "\t-b: disable some sanity checks for scripting\n"
-      "\t-h: print this help message\n"
-      "\n"
-      "\tdefault: run until all specified processes ended\n"
-      ,name);
+      "%1$s: [OPTION]... [PID]... \n"
+      "  -r, --running=n: stop if no more than n processes are left (default 0)\n"
+      "  -s, --stopped=n: stop if at least n processes are stopped (default 1)\n"
+      "  -e, --exec=\"cmd\": command to be executed if treshold met\n"
+      "  -i, --interval=n: polling interval in seconds (default 1)\n"
+      "  -v, --verbose: be verbose about monitored processes\n"
+      "  -h, --help: print this help message\n\n"
+      "default behaviour: run until all specified processes are ended\n\n"
+      "This is version "PACKAGE_VERSION" \n",
+      name);
 }
 
 #define CHECKED_STRTOX(func,success,result,arg)         \
