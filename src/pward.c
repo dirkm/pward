@@ -1,14 +1,11 @@
 #define _GNU_SOURCE
 #include "proc_impl.h"
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <getopt.h>
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <limits.h>
 #include <sys/types.h>
 
 static void
