@@ -3,10 +3,13 @@
 ** add functionality
 *** wait for file, socket instead of process
 *** add more efficient implementations instead of polling the proc-table
-*** explore ptrace for process tracking 
+**** explore ptrace for process tracking 
 *** cleanup printing of process-table to actually get tabbing right
 *** find a way to pass pids of still-running / dead pids to the program in exec
-This could be {} like in the find -exec option.
+This could be like {} in the "find -exec" command.
+*** cleanup configure scripts.
+**** link dynamically against libproc
+**** get rid of -g flag
 ** tried but failed
 *** BSD
 attempted BSD process accounting but turned out ugly,
