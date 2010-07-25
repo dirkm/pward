@@ -144,7 +144,7 @@ proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,bool batch,
    if(!batch && !nProcs)
    {
       if(verbose)
-         fprintf(stderr, "no processes found, bailing out\n");
+         printf("no processes found, bailing out\n");
       return -4;
    }
 

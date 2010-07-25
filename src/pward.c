@@ -136,8 +136,7 @@ int main(int argc,const char* argv[])
 
    if(!nProcsInit && !batch)
    {
-      fprintf(stderr,
-              "WARNING: no processes are monitored\n\n");
+      printf("WARNING: no processes are monitored\n\n");
    }
    /* recalculate 'stop' in terms of number of running processes */
    if(stopCondition)
