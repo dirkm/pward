@@ -42,6 +42,9 @@ OPTIONS
 
 
 FILES
+       /proc  location of the proc file system
+
+
 ENVIRONMENT
 DIAGNOSTICS
        The following diagnostics may be issued on stderr:
