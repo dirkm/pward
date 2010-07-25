@@ -62,7 +62,7 @@ int main(int argc,const char* argv[])
             {0, 0, 0, 0}
          };
 
-      int c = getopt_long(argc,(char* const*)argv, "vhfr::s::e:bi:",
+      int c = getopt_long(argc,(char* const*)argv, "vhr::s::e:bi:",
 			  long_options,NULL);
       if(c==-1)
          break;
