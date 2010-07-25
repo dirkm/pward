@@ -89,7 +89,7 @@ int main(int argc,const char* argv[])
                CHECKED_STRTOX(strtoul,success,running,optarg);
                if(!success)
                {
-		  fprintf(stderr,"non numeric parameter: '%s'"
+		  fprintf(stderr,"non numeric parameter: '%s' "
 			  "as number of running processes\n",optarg);
 		  return -1;
                }
@@ -103,7 +103,7 @@ int main(int argc,const char* argv[])
                CHECKED_STRTOX(strtoul,success,stopped,optarg);
                if(!success)
                {
-		  fprintf(stderr,"non numeric parameter: '%s'"
+		  fprintf(stderr,"non numeric parameter: '%s' "
 			  "as number as stopped processes\n",optarg);
 		  return -1;
                }
@@ -127,7 +127,7 @@ int main(int argc,const char* argv[])
 	    CHECKED_STRTOX(strtoul,success,stopped,optarg);
 	    if(!success)
             {
-               fprintf(stderr,"non numeric parameter: '%s'"
+               fprintf(stderr,"non numeric parameter: '%s' "
                        "as interval time\n",optarg);
                return -1;
             }
@@ -153,7 +153,7 @@ int main(int argc,const char* argv[])
       {
          if(!batch)
 	    fprintf(stderr,
-		    "WARNING: requesting more stopped processes (%zu)"
+		    "WARNING: requesting more stopped processes (%zu) "
 		    "than the number of processes at startup (%zu)\n",stopped,nProcsInit);
       }
       else if(running<nProcsInit-stopped)
@@ -167,7 +167,7 @@ int main(int argc,const char* argv[])
       CHECKED_STRTOX(strtoul,success,pids[i],argv[nLastOptionIndex+i]);
       if(!success)
       {
-         fprintf(stderr,"non numeric parameter: '%s'"
+         fprintf(stderr,"non numeric parameter: '%s' "
                  "as process id\n",argv[nLastOptionIndex+i]);
          return -1;
       }
