@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.65)
-AC_INIT([pward],[0.6],[dirkmoermans@gmail.com])
+AC_INIT([pward],[0.6.1],[dirkmoermans@gmail.com])
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
