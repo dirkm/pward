@@ -43,6 +43,9 @@ print a help message at startup.
 space separated list of process-ids to be monitored. 
 
 .SH FILES
+.TP 
+/proc
+location of the proc file system
 
 .SH ENVIRONMENT
 
