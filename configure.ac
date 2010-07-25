@@ -29,7 +29,6 @@ AC_ARG_WITH([proc-hdr-dir],
   [IPROC_DIR=/usr/include/proc])
 
 AC_CHECK_LIB($LPROC,openproc)
-AC_SUBST(LPROC)
 AC_SUBST(IPROC_DIR)
 
 # Checks for header files.
