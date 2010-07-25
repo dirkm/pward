@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <proc_impl.h>
 
-const char proc_dump_header[]="   PID    STIME CMD\n";
-const char proc_dump_format[]="%6d %8llu %s\n";
+static const char proc_dump_header[]="   PID    STIME CMD\n";
+static const char proc_dump_format[]="%6d %8llu %s\n";
 
 static inline
 int cmppid(const void* l, const void* r)
