@@ -12,28 +12,11 @@ AC_PROG_CC
 
 # Checks for libraries.
 
-AC_ARG_WITH([proc-lib],
-  [  --with-proc-lib=proc
-                          used proc library],
-  [if test x"$withval" != x ; then
-     LPROC="$withval"
-   fi],
-  [LPROC=proc])
-
-AC_ARG_WITH([proc-hdr-dir],
-  [  --with-proc-hdr-dir=DIR
-                          used proc header dir],
-  [if test x"$withval" != x ; then
-     IPROC_DIR="$withval"
-   fi],
-  [IPROC_DIR=/usr/include/proc])
-
-AC_CHECK_LIB($LPROC,openproc)
-AC_SUBST(IPROC_DIR)
+AC_CHECK_LIB(proc,openproc)
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([limits.h stdlib.h string.h $IPROC_DIR/readproc.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h proc/readproc.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
