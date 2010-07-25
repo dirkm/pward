@@ -49,9 +49,6 @@ ENVIRONMENT
 DIAGNOSTICS
        The following diagnostics may be issued on stderr:
 
-       non numeric parameter
-	      The input parameter is not a number.
-
        command failed
 	      the command in the -exec option failed to execute.
 
