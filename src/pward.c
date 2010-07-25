@@ -90,7 +90,7 @@ int main(int argc,const char* argv[])
                if(!success)
                {
 		  fprintf(stderr,"non numeric parameter: '%s'"
-			  "as number of running processes",optarg);
+			  "as number of running processes\n",optarg);
 		  return -1;
                }
 	    }
@@ -186,7 +186,7 @@ int main(int argc,const char* argv[])
       if(verbose)
          printf("executing command: '%s'\n",cmd);
       if(!system(cmd))
-         fprintf(stderr,"command '%s' failed to spawn",cmd);
+         fprintf(stderr,"command '%s' failed to spawn\n",cmd);
    }
    return 0;
 }
