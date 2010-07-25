@@ -1,5 +1,5 @@
-.\" groff -man -Tascii pward.1
-.\" groff -man -Tascii pward.1 | col -b
+.\" groff -man -Tascii pward.man
+.\" groff -man -Tascii pward.man | col -b
 .TH PWARD 1 "July 2010" Linux "User Manuals"
 .SH NAME
 pward \- monitor the lifecycle of a set of processes.
@@ -59,9 +59,16 @@ command failed
 the command in the -exec option failed to execute.
 .RE
 
+cannot access /proc.
+.RS
+pward has no access to the proc filesystem.
+.RE
+
 .SH BUGS
-pward checks processes by polling the proc-table.
+pward checks processes by polling the proc-table. 
 This is portable, but an implementation with modern kernel features would be more efficient.
+
+pward is only tested on linux (32/64 bits).
 
 .SH EXAMPLES
 .B pward `pgrep emerge` -v -i10 -e"shutdown -h +10"

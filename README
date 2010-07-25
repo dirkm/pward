@@ -52,11 +52,16 @@ DIAGNOSTICS
        command failed
 	      the command in the -exec option failed to execute.
 
+       cannot access /proc.
+	      pward has no access to the proc filesystem.
+
 
 BUGS
        pward  checks  processes  by polling the proc-table.  This is portable,
        but an implementation with modern kernel features would be  more  effi-
        cient.
+
+       pward is only tested on linux (32/64 bits).
 
 
 EXAMPLES
