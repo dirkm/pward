@@ -26,20 +26,16 @@ print_usage(const char* name)
       name);
 }
 
-#define CHECKED_STRTOX(func,success,result,arg)         \
-   do                                                   \
-   {                                                    \
-      errno=0;                                          \
-      char* endptr;                                     \
-      result=func(arg,&endptr,10);                      \
-      if ((errno == ERANGE) || (errno == EINVAL)        \
-          ||(endptr==arg)                               \
-          ||(*endptr!='\0'))                            \
-         success=0;                                     \
-      else                                              \
-         success=1;                                     \
-   }                                                    \
-   while(0)
+static inline size_t checked_strtoul(const char* arg, bool* success)
+{
+   errno=0;
+   char* endptr;
+   long signed_result=strtol(arg,&endptr,10);
+   *success= (errno != ERANGE) &&(errno != EINVAL)
+      && (endptr!=arg) && (*endptr=='\0')
+      &&(signed_result>0);
+   return (size_t)signed_result;
+}
 
 int main(int argc,const char* argv[])
 {
@@ -83,10 +79,10 @@ int main(int argc,const char* argv[])
             if(optarg!=NULL)
 	    {
                bool success;
-               CHECKED_STRTOX(strtoul,success,running,optarg);
+               running=checked_strtoul(optarg,&success);
                if(!success)
                {
-		  fprintf(stderr,"non numeric parameter: '%s' "
+		  fprintf(stderr,"invalid parameter: '%s' "
 			  "as number of running processes\n",optarg);
 		  return -1;
                }
@@ -97,10 +93,10 @@ int main(int argc,const char* argv[])
             if(optarg!=NULL)
 	    {
                bool success;
-               CHECKED_STRTOX(strtoul,success,stopped,optarg);
+               stopped=checked_strtoul(optarg,&success);
                if(!success)
                {
-		  fprintf(stderr,"non numeric parameter: '%s' "
+		  fprintf(stderr,"invalid parameter: '%s' "
 			  "as number as stopped processes\n",optarg);
 		  return -1;
                }
@@ -121,10 +117,10 @@ int main(int argc,const char* argv[])
          case 'i':
          {
 	    bool success;
-	    CHECKED_STRTOX(strtoul,success,stopped,optarg);
+	    stopped=checked_strtoul(optarg,&success);
 	    if(!success)
             {
-               fprintf(stderr,"non numeric parameter: '%s' "
+               fprintf(stderr,"invalid parameter: '%s' "
                        "as interval time\n",optarg);
                return -1;
             }
@@ -161,10 +157,10 @@ int main(int argc,const char* argv[])
    for(int i=0;i<nProcsInit;++i)
    {
       bool success;
-      CHECKED_STRTOX(strtoul,success,pids[i],argv[nLastOptionIndex+i]);
+      pids[i]=checked_strtoul(argv[nLastOptionIndex+i],&success);
       if(!success)
       {
-         fprintf(stderr,"non numeric parameter: '%s' "
+         fprintf(stderr,"invalid parameter: '%s' "
                  "as process id\n",argv[nLastOptionIndex+i]);
          return -1;
       }
