@@ -102,13 +102,7 @@ int main(int argc,const char* argv[])
 	    }
             break;
          case 'e':
-            if(optarg!=NULL)
-               cmd=strdupa(optarg);
-            else
-	    {
-               fprintf(stderr,"missing argument to option 'exec'\n");
-               return -1;
-	    }
+            cmd=strdupa(optarg);
             break;
          case 'b':
             batch=1;
