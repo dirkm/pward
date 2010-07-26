@@ -13,9 +13,9 @@ static const char proc_dir[]="/proc";
 
 const int MAX_CMDLENGTH=256;
 
-// get_proc_stats writes perror when the process does not exist.
-// the code below works around the issue, but performance suffers and a potential race
-// is introduced
+/* get_proc_stats writes perror when the process does not exist.
+   the code below works around the issue, but performance suffers and a potential race
+   is introduced */
 
 static inline
 proc_t * hacked_get_proc_stats(pid_t pid, proc_t *p)
@@ -71,7 +71,7 @@ size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_ti
    }
    if(verbose)
       printf("-----\n");
-   return nProcs; // processes_found
+   return nProcs; /* processes_found */
 }
 
 /* return-value:  */
@@ -98,7 +98,7 @@ size_t check_procs(size_t nProcs,pid_t* pids, unsigned long long* start_times,
                continue;
             }
             else
-               break; // nProcs will be an overestimate
+               break; /* nProcs will be an overestimate */
          }
          else if(verbose)
          {

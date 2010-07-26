@@ -45,7 +45,7 @@ int main(int argc,const char* argv[])
 
    bool stopCondition=false;
    size_t stopped=1;
-   int nInterval=1; // seconds
+   int nInterval=1; /* seconds */
 
    while(1)
    {
