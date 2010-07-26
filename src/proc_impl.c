@@ -17,7 +17,7 @@ const int MAX_CMDLENGTH=256;
 // the code below works around the issue, but performance suffers and a potential race
 // is introduced
 
-static
+static inline
 proc_t * hacked_get_proc_stats(pid_t pid, proc_t *p)
 {
    char path[PATH_MAX];
@@ -33,14 +33,13 @@ static
 size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_times,
                         bool verbose)
 {
+   struct stat statbuf;
+   if(stat(proc_dir,&statbuf))
    {
-      struct stat statbuf;
-      if(stat(proc_dir,&statbuf))
-      {
-         fprintf(stderr, "Error: cannot access /proc.\n");
-         exit(-1);
-      }
+      fprintf(stderr, "Error: cannot access /proc.\n");
+      exit(-1);
    }
+
 
    if(verbose)
    {
@@ -69,7 +68,7 @@ size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_ti
          fprintf(stderr,"WARNING: process %d not found\n",*pid_it);
          --nProcs;
          *pids=pids[nProcs];
-       }
+      }
    }
    if(verbose)
       printf("-----\n");
@@ -129,12 +128,10 @@ proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,bool batch,
       return -1;
    }
 
-   while(1)
+   while(nProcs>running)
    {
-      nProcs=check_procs(nProcs,pids,start_times,running,verbose);
-      if(nProcs<=running)
-         break;
       sleep(nInterval);
+      nProcs=check_procs(nProcs,pids,start_times,running,verbose);
    }
    return 0;
 }
