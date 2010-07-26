@@ -1,43 +1,45 @@
-#include <proc/readproc.h>
-#include <search.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <linux/limits.h>
 #include <proc_impl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+
+#include <proc/readproc.h>
 
 static const char proc_dump_header[]="   PID    STIME CMD\n";
 static const char proc_dump_format[]="%6d %8llu %s\n";
 
-static inline
-int cmppid(const void* l, const void* r)
-{
-   return *((pid_t*)l)-*((pid_t*)r);
-}
+static const char proc_dir[]="/proc";
 
-static inline
-void cleanup_proc(proc_t* p)
-{
-   if (p->cmdline)
-      free((void*)*p->cmdline);
-}
+const int MAX_CMDLENGTH=256;
 
-#define SWAP(Type,parg1,parg2)                  \
-   do                                           \
-   {                                            \
-      Type *p1=parg1, *p2=parg2, tmp=*p1;       \
-      *p1=*p2;                                  \
-      *p2=tmp;                                  \
-   }                                            \
-   while(0)
+// get_proc_stats writes perror when the process does not exist.
+// the code below works around the issue, but performance suffers and a potential race
+// is introduced
 
 static
-int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
-		     bool verbose)
+proc_t * hacked_get_proc_stats(pid_t pid, proc_t *p)
 {
-   PROCTAB* ptp=openproc(PROC_FILLARG|PROC_FILLSTAT);
-   if(!ptp)
+   char path[PATH_MAX];
+   struct stat statbuf;
+
+   sprintf(path, "/proc/%d", pid);
+   return stat(path, &statbuf)?
+      NULL:
+      get_proc_stats(pid,p);
+}
+
+static
+size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_times,
+                        bool verbose)
+{
    {
-      fprintf(stderr, "Error: cannot access /proc.\n");
-      exit(-1);
+      struct stat statbuf;
+      if(stat(proc_dir,&statbuf))
+      {
+         fprintf(stderr, "Error: cannot access /proc.\n");
+         exit(-1);
+      }
    }
 
    if(verbose)
@@ -45,30 +47,33 @@ int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
       printf("monitoring:\n");
       printf(proc_dump_header);
    }
-
-   pid_t* pidsstart=pids;
-   proc_t buf;
-   while(readproc(ptp,&buf))
+   pid_t* pid_it=pids;
+   unsigned long long* st_it=start_times;
+   while(pid_it<pids+nProcs)
    {
-      pid_t* p=
-         (pid_t*)lfind(&buf.tgid,pids,&nProcs,sizeof(pid_t),cmppid);
-      if(p!=NULL)
+      proc_t buf;
+      proc_t* r=hacked_get_proc_stats(*pid_it,&buf);
+      if(r)
       {
-         SWAP(pid_t,p,pids);
-
-         *startTimes=buf.start_time;
-         --nProcs;++pids;++startTimes;
-
+         *st_it=buf.start_time;
          if(verbose)
-            printf(proc_dump_format,buf.tgid,buf.start_time,buf.cmd);
+         {
+            char cmdline[MAX_CMDLENGTH];
+            read_cmdline(cmdline,sizeof(cmdline),*pid_it);
+            printf(proc_dump_format,*pid_it,*st_it,cmdline);
+         }
+         ++pid_it,++st_it;
       }
-      cleanup_proc(&buf);
+      else
+      {
+         fprintf(stderr,"WARNING: process %d not found\n",*pid_it);
+         --nProcs;
+         *pids=pids[nProcs];
+       }
    }
    if(verbose)
       printf("-----\n");
-
-   closeproc(ptp);
-   return pids-pidsstart; // processes_found
+   return nProcs; // processes_found
 }
 
 /* return-value:  */
@@ -76,85 +81,60 @@ int init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* startTimes,
 /*   if treshold is not met: overestimate (number of processes still to be considered)  */
 
 static
-int check_procs(size_t nProcs,pid_t* pids, unsigned long long* startTimes,
-		size_t treshold, bool verbose)
+size_t check_procs(size_t nProcs,pid_t* pids, unsigned long long* start_times,
+                   size_t treshold, bool verbose)
 {
-   PROCTAB* ptp=openproc(PROC_FILLSTAT);
-   if(!ptp)
+   pid_t* pid_it=pids;
+   unsigned long long* st_it=start_times;
+   while(pid_it<pids+nProcs)
    {
-      fprintf(stderr, "Error: cannot access /proc.\n");
-      exit(-2);
-   }
-
-   pid_t* pidsstart=pids;
-   proc_t buf;
-   while(nProcs && readproc(ptp,&buf))
-   {
-      pid_t* p=
-         (pid_t*)lfind(&buf.tgid,pids,&nProcs,sizeof(pid_t),cmppid);
-      if(p!=NULL)
+      proc_t buf;
+      proc_t* r=hacked_get_proc_stats(*pid_it,&buf);
+      if(r)
       {
-         --nProcs;
-         if(startTimes[p-pids]==buf.start_time)
+         if(*st_it==buf.start_time)
          {
-            /* pids are stored in the order that they are found;
-               we assume that the next run will returns results in the same order
-               this should speed up our linear array lookup */
-            SWAP(pid_t,p,pids);
-            SWAP(unsigned long long,startTimes,startTimes+(p-pids));
-            /* an entry can only be found once, so increment base value */
-            ++pids,++startTimes;
-            if((pids-pidsstart)>treshold)
+            if((pid_it-pids)<treshold)
             {
-               pids+=nProcs;
-               /* return overestimate (pretend all remaining pids are matches) */
-               cleanup_proc(&buf);
-               break;
+               ++pid_it;++st_it;
+               continue;
             }
+            else
+               break; // nProcs will be an overestimate
          }
-         else
+         else if(verbose)
          {
-            if(verbose)
-            {
-               printf("reused process id detected: %d\n",buf.tgid);
-               printf(proc_dump_format,buf.tgid,buf.start_time,buf.cmd);
-            }
-            /* ignore restarted pids in future runs */
-            *p=pids[nProcs];
-            startTimes[p-pids]=startTimes[nProcs];
+            printf("reused process id detected: %d\n",buf.tgid);
+            printf(proc_dump_format,buf.tgid,buf.start_time,buf.cmd);
          }
       }
-      cleanup_proc(&buf);
+      --nProcs;
+      *pid_it=pids[nProcs];
+      *st_it=start_times[nProcs];
    }
-   closeproc(ptp);
-   return pids-pidsstart;
+   return nProcs;
 }
 
 int
 proc_observe_processes(size_t nProcsInit,pid_t* pids,size_t running,bool batch,
-		       bool verbose, int nInterval)
+                       bool verbose, int nInterval)
 {
-   unsigned long long startTimes[nProcsInit];
-   for(int i=0;i<nProcsInit;++i)
-   {
-      startTimes[i]=~0ULL;
-   }
+   unsigned long long start_times[nProcsInit];
 
-   size_t nProcs=init_check_procs(nProcsInit,pids,startTimes,verbose);
+   size_t nProcs=init_check_procs(nProcsInit,pids,start_times,verbose);
    if(!batch && !nProcs)
    {
       if(verbose)
          printf("no processes found, bailing out\n");
-      return -4;
+      return -1;
    }
 
    while(1)
    {
-      nProcs=check_procs(nProcs,pids,startTimes,running,verbose);
+      nProcs=check_procs(nProcs,pids,start_times,running,verbose);
       if(nProcs<=running)
          break;
-      sleep(nInterval); // TODO: maybe time has to include time taken for check_procs
+      sleep(nInterval);
    }
-
    return 0;
 }

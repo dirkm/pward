@@ -2,7 +2,7 @@
 .\" groff -man -Tascii pward.man | col -b
 .TH PWARD 1 "July 2010" Linux "User Manuals"
 .SH NAME
-pward \- monitor the lifecycle of a set of processes.
+pward \- check if a set of processes stays alive
 .SH SYNOPSIS
 .B pward
 [
@@ -13,7 +13,7 @@ PID
 ] ...
 .SH DESCRIPTION
 .B pward
-monitors a set of processes given at the command-line. By default,
+observes a set of processes given at the command-line. By default,
 pward stops when all specified processes have died.
 Optionnally, it stops when a specified number of processes has stopped,
 or when less than a specified number of processes is still running.

@@ -3,13 +3,13 @@ PWARD(1)			 User Manuals			      PWARD(1)
 
 
 NAME
-       pward - monitor the lifecycle of a set of processes.
+       pward - check if a set of processes stays alive
 
 SYNOPSIS
        pward [ OPTION ] ... [ PID ] ...
 
 DESCRIPTION
-       pward  monitors	a  set	of  processes  given  at  the command-line. By
+       pward  observes	a  set	of  processes  given  at  the command-line. By
        default, pward stops when all specified processes have  died.   Option-
        nally,  it  stops  when a specified number of processes has stopped, or
        when less than a specified number of processes is  still  running.   It
