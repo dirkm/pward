@@ -40,7 +40,6 @@ size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_ti
       exit(-1);
    }
 
-
    if(verbose)
    {
       printf("monitoring:\n");
