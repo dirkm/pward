@@ -10,10 +10,10 @@ SYNOPSIS
 
 DESCRIPTION
        pward  observes	a  set	of  processes  given  at  the command-line. By
-       default, pward stops when all specified processes have  died.   Option-
-       nally,  it  stops  when a specified number of processes has stopped, or
-       when less than a specified number of processes is  still  running.   It
-       can be configured to execute a specified command before stopping.
+       default, pward stops when all these processes have died.   Optionnally,
+       it stops when a configurable number of processes has died, or when less
+       than a number of processes is still running.  It can be	configured  to
+       execute a command before stopping.
 
 OPTIONS
        -r, --running=n
