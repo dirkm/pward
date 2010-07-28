@@ -15,7 +15,7 @@ PID
 .B pward
 observes a set of processes given at the command-line. By default,
 pward stops when all these processes have died.
-Optionnally, it stops when a configurable number of processes has died,
+Optionally, it stops when a configurable number of processes has died,
 or when less than a number of processes is still running.
 It can be configured to execute a command before stopping.
 .SH OPTIONS
