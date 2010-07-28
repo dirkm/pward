@@ -68,6 +68,10 @@ This is portable, but an implementation with modern kernel features would be mor
 
 pward is only tested on linux (32/64 bits).
 
+pward is similar to the bash builtin \fIwait\fR. Whilst \fIwait\fR  waits for child-processes of the running bash,
+pward can wait for every process on the system. This comes
+at a performance cost.
+
 .SH EXAMPLES
 .B pward `pgrep emerge` -v -i10 -e"shutdown -h +10"
 
