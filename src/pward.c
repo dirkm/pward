@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include "proc_impl.h"
+#include "inotify_proc_impl.h"
 
 #include <errno.h>
 #include <getopt.h>
@@ -32,7 +33,7 @@ static inline size_t checked_strtoul(const char* arg, bool* success)
    long signed_result=strtol(arg,&endptr,10);
    *success= (errno != ERANGE) &&(errno != EINVAL)
       && (endptr!=arg) && (*endptr=='\0')
-      &&(signed_result>0);
+      &&(signed_result>=0);
    return (size_t)signed_result;
 }
 
@@ -157,8 +158,12 @@ int main(int argc,const char* argv[])
       }
    }
 
-   int result=proc_observe_processes
+   int result=inotify_proc_observe_processes
       (nProcsInit,pids,running,batch,verbose,nInterval);
+
+
+//   int result=proc_observe_processes
+//      (nProcsInit,pids,running,batch,verbose,nInterval);
    if(result)
       return result;
 
