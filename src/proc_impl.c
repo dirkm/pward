@@ -9,7 +9,7 @@
 static const char proc_dump_header[]="   PID    STIME CMD\n";
 static const char proc_dump_format[]="%6d %8llu %s\n";
 
-static const char proc_dir[]="/proc";
+#define PROC_DIR "/proc"
 
 const int MAX_CMDLENGTH=256;
 
@@ -18,25 +18,25 @@ const int MAX_CMDLENGTH=256;
    is introduced */
 
 static inline
-proc_t * hacked_get_proc_stats(pid_t pid, proc_t *p)
+proc_t*
+hacked_get_proc_stats(pid_t pid, proc_t *p)
 {
    char path[PATH_MAX];
    struct stat statbuf;
 
-   sprintf(path, "/proc/%d", pid);
+   sprintf(path, PROC_DIR"/%d", pid);
    return stat(path, &statbuf)?
       NULL:
       get_proc_stats(pid,p);
 }
 
-static
-size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_times,
-                        bool verbose)
+static size_t
+init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_times, bool verbose)
 {
    struct stat statbuf;
-   if(stat(proc_dir,&statbuf))
+   if(stat(PROC_DIR,&statbuf))
    {
-      fprintf(stderr, "Error: cannot access /proc.\n");
+      fprintf(stderr, "Error: cannot access"PROC_DIR".\n");
       exit(-1);
    }
 
@@ -66,7 +66,7 @@ size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_ti
       {
          fprintf(stderr,"WARNING: process %d not found\n",*pid_it);
          --nProcs;
-         *pids=pids[nProcs];
+         *pid_it=pids[nProcs];
       }
    }
    if(verbose)
@@ -74,13 +74,13 @@ size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_ti
    return nProcs; /* processes_found */
 }
 
-/* return-value:  */
-/*   Normally: number of processes still found */
-/*   if treshold is not met: overestimate (number of processes still to be considered)  */
+ /* return-value:
+      Normally: number of processes still found
+      if treshold is not met: overestimate (number of processes still to be considered) */
 
-static
-size_t check_procs(size_t nProcs,pid_t* pids, unsigned long long* start_times,
-                   size_t treshold, bool verbose)
+static size_t
+check_procs(size_t nProcs,pid_t* pids, unsigned long long* start_times,
+            size_t treshold, bool verbose)
 {
    pid_t* pid_it=pids;
    unsigned long long* st_it=start_times;

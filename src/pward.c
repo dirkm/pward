@@ -9,7 +9,7 @@
 #include <sys/types.h>
 
 static void
-print_usage(const char* name)
+print_usage()
 {
    printf(
       PACKAGE": [OPTION]... [PID]... \n"
@@ -25,18 +25,20 @@ print_usage(const char* name)
       "pward-version: "PACKAGE_VERSION" \n");
 }
 
-static inline size_t checked_strtoul(const char* arg, bool* success)
+static inline size_t
+checked_strtoul(const char* arg, bool* success)
 {
    errno=0;
    char* endptr;
    long signed_result=strtol(arg,&endptr,10);
    *success= (errno != ERANGE) &&(errno != EINVAL)
       && (endptr!=arg) && (*endptr=='\0')
-      &&(signed_result>0);
+      &&(signed_result>=0);
    return (size_t)signed_result;
 }
 
-int main(int argc,const char* argv[])
+int
+main(int argc,const char* argv[])
 {
    bool verbose=false;
    bool batch=false;
@@ -47,20 +49,20 @@ int main(int argc,const char* argv[])
    size_t stopped=1;
    int nInterval=1; /* seconds */
 
+   const struct option long_options[]=
+      {
+         {"verbose", 0, 0, 'v'},
+         {"help", 0, 0, 'h'},
+         {"running", 2, 0, 'r'},
+         {"stopped", 2, 0, 's'},
+         {"exec", 1, 0, 'e'},
+         {"batch", 0, 0, 'b'},
+         {"interval", 1, 0, 'i'},
+         {0, 0, 0, 0}
+      };
+
    while(1)
    {
-      static const struct option long_options[]=
-         {
-            {"verbose", 0, 0, 'v'},
-            {"help", 0, 0, 'h'},
-            {"running", 2, 0, 'r'},
-            {"stopped", 2, 0, 's'},
-            {"exec", 1, 0, 'e'},
-            {"batch", 0, 0, 'b'},
-            {"interval", 1, 0, 'i'},
-            {0, 0, 0, 0}
-         };
-
       int c = getopt_long(argc,(char* const*)argv, "vhr::s::e:bi:",
 			  long_options,NULL);
       if(c==-1)
