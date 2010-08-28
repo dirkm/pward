@@ -17,8 +17,7 @@ const int MAX_CMDLENGTH=256;
    the code below works around the issue, but performance suffers and a potential race
    is introduced */
 
-static inline
-proc_t*
+static inline proc_t*
 hacked_get_proc_stats(pid_t pid, proc_t *p)
 {
    char path[PATH_MAX];
