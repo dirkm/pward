@@ -74,7 +74,7 @@ main(int argc,const char* argv[])
             verbose=1;
             break;
          case 'h':
-            print_usage(argv[0]);
+            print_usage();
             return -1;
          case 'r':
             if(optarg!=NULL)
