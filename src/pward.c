@@ -158,9 +158,7 @@ int main(int argc,const char* argv[])
       }
    }
 
-   int result=inotify_proc_observe_processes
-      (nProcsInit,pids,running,batch,verbose,nInterval);
-
+   int result=inotify_proc_observe_processes(nProcsInit,pids,running,verbose);
 
 //   int result=proc_observe_processes
 //      (nProcsInit,pids,running,batch,verbose,nInterval);

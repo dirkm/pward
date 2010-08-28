@@ -6,9 +6,6 @@
 
 #include <proc/readproc.h>
 
-static const char proc_dump_header[]="   PID    STIME CMD\n";
-static const char proc_dump_format[]="%6d %8llu %s\n";
-
 static const char proc_dir[]="/proc";
 
 const int MAX_CMDLENGTH=256;
@@ -42,8 +39,6 @@ size_t init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_ti
 
    if(verbose)
    {
-      printf("monitoring:\n");
-      printf(proc_dump_header);
    }
    pid_t* pid_it=pids;
    unsigned long long* st_it=start_times;
