@@ -35,7 +35,7 @@ init_check_procs(size_t nProcs, pid_t* pids, unsigned long long* start_times, bo
    struct stat statbuf;
    if(stat(PROC_DIR,&statbuf))
    {
-      fprintf(stderr, "Error: cannot access"PROC_DIR".\n");
+      fprintf(stderr, "Error: cannot access "PROC_DIR".\n");
       exit(-1);
    }
 

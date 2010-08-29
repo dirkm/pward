@@ -22,7 +22,7 @@ print_usage()
       "  -h, --help: print this help message\n\n"
       "  [PID]: space separated list of process-ids to be monitored.\n\n"
       "default behaviour: run until all specified processes have died\n"
-      "pward-version: "PACKAGE_VERSION" \n");
+      "pward-version: "PACKAGE_VERSION"\n");
 }
 
 static inline size_t
