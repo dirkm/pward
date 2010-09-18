@@ -31,9 +31,9 @@ checked_strtoul(const char* arg, bool* success)
    errno=0;
    char* endptr;
    long signed_result=strtol(arg,&endptr,10);
-   *success= (errno != ERANGE) &&(errno != EINVAL)
+   *success= (errno != ERANGE) && (errno != EINVAL)
       && (endptr!=arg) && (*endptr=='\0')
-      &&(signed_result>=0);
+      && (signed_result>=0);
    return (size_t)signed_result;
 }
 
@@ -71,7 +71,7 @@ main(int argc,const char* argv[])
       switch(c)
       {
          case 'v':
-            verbose=1;
+            verbose=true;
             break;
          case 'h':
             print_usage();
@@ -90,7 +90,7 @@ main(int argc,const char* argv[])
 	    }
             break;
          case 's':
-            stopCondition=1;
+            stopCondition=true;
             if(optarg!=NULL)
 	    {
                bool success;
@@ -107,7 +107,7 @@ main(int argc,const char* argv[])
             cmd=strdupa(optarg);
             break;
          case 'b':
-            batch=1;
+            batch=true;
             break;
          case 'i':
          {
