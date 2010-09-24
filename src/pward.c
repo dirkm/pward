@@ -9,7 +9,7 @@
 #include <sys/types.h>
 
 static void
-print_usage()
+print_usage(void)
 {
    printf(
       PACKAGE": [OPTION]... [PID]... \n"
