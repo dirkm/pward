@@ -5,6 +5,6 @@
 #include <stdbool.h>
 
 extern int
-proc_observe_processes(size_t nProcsInit,pid_t* pids, size_t running, bool batch,bool verbose, int nInterval);
+proc_observe_processes(size_t nProcsInit, pid_t* pids, size_t running, bool batch, bool verbose, int nInterval);
 
 #endif
