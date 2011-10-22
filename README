@@ -77,7 +77,7 @@ AUTHOR
        Dirk Moermans <dirkmoermans @ gmail.com>
 
 SEE ALSO
-       pgrep(1), pkill(1), top(1)
+       pgrep(1), pkill(1), top(1), wait(1)
 
 
 

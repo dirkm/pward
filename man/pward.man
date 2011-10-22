@@ -81,4 +81,5 @@ Dirk Moermans <dirkmoermans @ gmail.com>
 .SH "SEE ALSO"
 .BR pgrep (1),
 .BR pkill (1),
-.BR top (1)
+.BR top (1),
+.BR wait (1)
